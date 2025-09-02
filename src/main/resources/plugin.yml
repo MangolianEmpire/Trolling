@@ -1,0 +1,17 @@
+name: Trolling
+version: 1.0
+main: de.mangole.trolling.Trolling
+api-version: 1.20
+commands:
+    world:
+      description: teleport between worlds
+      usage: /world <list|tp>
+      permission: trolling.world
+    worldreset:
+      description: Resettet alle Standardwelten (Overworld, Nether, End)
+      usage: /worldreset <light|hard>
+      permission: trolling.worldreset
+    gamechange:
+      description: changes Game Status (start, pause, resume, lose, stop)
+      usage: /gamechange <status>
+      permission: trolling.gamechange
