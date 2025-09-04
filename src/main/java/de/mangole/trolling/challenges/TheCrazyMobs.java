@@ -8,6 +8,7 @@ import org.bukkit.block.data.type.TNT;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.*;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -162,6 +163,37 @@ public class TheCrazyMobs extends CustomChallenge {
                 tnt.setVelocity(dir.multiply(0.5)); // Stärke anpassen, z.B. 0.5 für "nicht so weit"
             }
         }
+    }
+
+    @EventHandler
+    public void onChickenDeath(EntityDeathEvent event) {
+        if (event.getEntityType() != EntityType.CHICKEN) return;
+        Location loc = event.getEntity().getLocation();
+
+        double radius = 3.0;
+        double knockback_strength = 3.0;
+        double damage = 6.0;
+
+        Firework firework = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK_ROCKET);
+        FireworkMeta meta = firework.getFireworkMeta();
+        meta.addEffect(FireworkEffect.builder()
+                .withColor(Color.WHITE)
+                .with(FireworkEffect.Type.BALL)
+                .trail(true)
+                .build());
+        meta.setPower(0);
+        firework.setFireworkMeta(meta);
+        firework.detonate();
+
+        for (Entity nearby: loc.getWorld().getNearbyEntities(loc, radius, radius, radius)){
+            ((LivingEntity)nearby).damage(damage);
+
+            if (nearby != event.getEntity()){
+                Vector knockback = nearby.getLocation().toVector().subtract(loc.toVector()).normalize().multiply(knockback_strength);
+                nearby.setVelocity(nearby.getVelocity().add(knockback));
+            }
+        }
+
     }
 
 }
