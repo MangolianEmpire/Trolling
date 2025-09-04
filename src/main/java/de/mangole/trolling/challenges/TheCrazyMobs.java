@@ -186,13 +186,20 @@ public class TheCrazyMobs extends CustomChallenge {
         firework.detonate();
 
         for (Entity nearby: loc.getWorld().getNearbyEntities(loc, radius, radius, radius)){
-            ((LivingEntity)nearby).damage(damage);
-
-            if (nearby != event.getEntity()){
-                Vector knockback = nearby.getLocation().toVector().subtract(loc.toVector()).normalize().multiply(knockback_strength);
-                nearby.setVelocity(nearby.getVelocity().add(knockback));
+            if(nearby instanceof LivingEntity && nearby != event.getEntity()){
+                ((LivingEntity)nearby).damage(damage);
             }
         }
+
+        loc.getWorld().getNearbyEntities(loc, radius, radius, radius).forEach(entity -> {
+            if (entity != event.getEntity()){
+                Vector direction = entity.getLocation().toVector().subtract(loc.toVector());
+                if (direction.lengthSquared() > 0.0001) { // avoid zero-length vectors
+                    Vector knockback = direction.normalize().multiply(knockback_strength);
+                    entity.setVelocity(entity.getVelocity().add(knockback));
+                }
+            }
+        });
 
     }
 
