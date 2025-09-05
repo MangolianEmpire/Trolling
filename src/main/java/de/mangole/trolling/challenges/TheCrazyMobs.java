@@ -2,9 +2,8 @@ package de.mangole.trolling.challenges;
 
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.utils.CustomChallenge;
-import de.mangole.trolling.utils.CustomChallengeItem;
+import io.papermc.paper.event.entity.EntityMoveEvent;
 import org.bukkit.*;
-import org.bukkit.block.data.type.TNT;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.*;
@@ -179,20 +178,17 @@ public class TheCrazyMobs extends CustomChallenge {
         meta.addEffect(FireworkEffect.builder()
                 .withColor(Color.WHITE)
                 .with(FireworkEffect.Type.BALL)
-                .trail(true)
                 .build());
         meta.setPower(0);
         firework.setFireworkMeta(meta);
         firework.detonate();
 
-        for (Entity nearby: loc.getWorld().getNearbyEntities(loc, radius, radius, radius)){
-            if(nearby instanceof LivingEntity && nearby != event.getEntity()){
-                ((LivingEntity)nearby).damage(damage);
-            }
-        }
 
         loc.getWorld().getNearbyEntities(loc, radius, radius, radius).forEach(entity -> {
-            if (entity != event.getEntity()){
+            if (entity != event.getEntity()) {
+                if (entity instanceof LivingEntity) {
+                    ((LivingEntity) entity).damage(damage);
+                }
                 Vector direction = entity.getLocation().toVector().subtract(loc.toVector());
                 if (direction.lengthSquared() > 0.0001) { // avoid zero-length vectors
                     Vector knockback = direction.normalize().multiply(knockback_strength);
@@ -201,6 +197,38 @@ public class TheCrazyMobs extends CustomChallenge {
             }
         });
 
+    }
+
+    @EventHandler
+    public void onGolemMove(EntityMoveEvent event) {
+        if (!(event.getEntity() instanceof IronGolem golem)) return;
+//        Bukkit.getScheduler().runTaskTimer(Trolling.plugin, task -> {
+        if (golem.isDead() || !golem.isValid()) {
+            return;
+        }
+        golem.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 4));
+        Player target = getNearestPlayer(golem);
+        if (target != null) {
+            golem.setTarget(target);
+        }
+//        }, 0L, 40L);
+    }
+
+    private Player getNearestPlayer(LivingEntity golem) {
+        double nearestDistance = Double.MAX_VALUE;
+        Player nearestPlayer = null;
+
+        for (Player player : golem.getWorld().getPlayers()) {
+            if (!player.isDead()) {
+                double distance = player.getLocation().distanceSquared(golem.getLocation());
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearestPlayer = player;
+                }
+            }
+        }
+
+        return nearestPlayer;
     }
 
 }
