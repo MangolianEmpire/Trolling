@@ -1,7 +1,7 @@
 package de.mangole.trolling.challenges;
 
+import de.mangole.trolling.WorldManager;
 import de.mangole.trolling.utils.CustomChallenge;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -18,13 +18,7 @@ public class FloodedWorld extends CustomChallenge {
 
     @Override
     protected void onActivate() {
-        World world = Bukkit.getWorld("world");
-        System.out.println(world);
-        assert world != null;
-        for (Chunk chunk : world.getLoadedChunks()) {
-            world.unloadChunk(chunk);
-            world.getChunkAt(chunk.getX(), chunk.getZ()).load(true);
-        }
+
     }
 
     @Override
@@ -39,7 +33,7 @@ public class FloodedWorld extends CustomChallenge {
         Chunk chunk = event.getChunk();
         World world = chunk.getWorld();
 
-        if (world.getEnvironment() != World.Environment.NORMAL || world.getSeed() == -580394497689020177L) {
+        if (world.getEnvironment() != World.Environment.NORMAL || WorldManager.lobbyWorld == world){
             return;
         }
 
