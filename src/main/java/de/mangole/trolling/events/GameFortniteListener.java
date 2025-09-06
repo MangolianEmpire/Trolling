@@ -95,7 +95,7 @@ public class GameFortniteListener implements Listener {
         Player nearest = null;
         Location loc = deadPlayer.getLocation();
 
-        for (Player other : Bukkit.getOnlinePlayers()) {
+        for (Player other : deadPlayer.getWorld().getPlayers()) {
             if (other.equals(deadPlayer)) continue;
             if (other.getGameMode() != org.bukkit.GameMode.SURVIVAL) continue; // nur lebende Spieler
 

@@ -1,5 +1,6 @@
 package de.mangole.trolling.utils;
 
+import de.mangole.trolling.Trolling;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -8,11 +9,11 @@ import org.bukkit.plugin.Plugin;
 public abstract class CustomChallenge implements Listener {
 
     private boolean active = false;
-    protected final Plugin plugin;
+    protected final Trolling trolling;
     private final String challengeName;
 
-    public CustomChallenge(Plugin plugin, String challengeName) {
-        this.plugin = plugin;
+    public CustomChallenge(Trolling trolling, String challengeName) {
+        this.trolling = trolling;
         this.challengeName = challengeName;
     }
 
@@ -27,7 +28,7 @@ public abstract class CustomChallenge implements Listener {
     public void activate() {
         if (!active) {
             active = true;
-            Bukkit.getPluginManager().registerEvents(this, plugin);
+            Bukkit.getPluginManager().registerEvents(this, trolling);
             onActivate();
             Bukkit.getOnlinePlayers().forEach(player -> {
                 player.sendMessage("§aChallenge §5" + challengeName + "§a wurde aktiviert");

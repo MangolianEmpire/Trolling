@@ -2,13 +2,10 @@ package de.mangole.trolling.challenges;
 
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.utils.CustomChallenge;
-import de.mangole.trolling.utils.CustomChallengeItem;
 import org.bukkit.*;
-import org.bukkit.block.data.type.TNT;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.*;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -18,8 +15,8 @@ import java.util.Random;
 
 public class TheCrazyMobs extends CustomChallenge {
 
-    public TheCrazyMobs(Plugin plugin) {
-        super(plugin, "TheCrazyMobs");
+    public TheCrazyMobs(Trolling trolling) {
+        super(trolling, "TheCrazyMobs");
     }
 
     @Override
@@ -68,7 +65,7 @@ public class TheCrazyMobs extends CustomChallenge {
                     cancel();
                 }
             }
-        }.runTaskTimer(plugin, 5L, 5L);
+        }.runTaskTimer(trolling, 5L, 5L);
     }
 
     @EventHandler

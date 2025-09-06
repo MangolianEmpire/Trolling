@@ -1,5 +1,6 @@
 package de.mangole.trolling.challenges;
 
+import de.mangole.trolling.Trolling;
 import de.mangole.trolling.utils.ContainerUtils;
 import de.mangole.trolling.utils.CustomChallenge;
 import org.bukkit.Material;
@@ -9,15 +10,14 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class WeirdChests extends CustomChallenge {
 
-    public WeirdChests(Plugin plugin) {
-        super(plugin, "WeirdChests");
+    public WeirdChests(Trolling trolling) {
+        super(trolling, "WeirdChests");
     }
 
     @Override
@@ -61,7 +61,7 @@ public class WeirdChests extends CustomChallenge {
             world.spawnParticle(Particle.PORTAL, chest.getLocation(), 5);
             world.playSound(chest.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.0f);
             int randomBlock = new Random().nextInt(surroundingBlocks.size());
-            ContainerUtils.swapBlockContainers(chest, surroundingBlocks.get(randomBlock), plugin);
+            ContainerUtils.swapBlockContainers(chest, surroundingBlocks.get(randomBlock), trolling);
         }
     }
 
