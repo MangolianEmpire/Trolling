@@ -50,7 +50,7 @@ public class FloodedWorld extends CustomChallenge {
                     for (int z = 0; z < 16; z++) {
                         for (int y = FLOOD_Y_LEVEL; y > world.getMinHeight(); y--) {
                             Block block = chunk.getBlock(x, y, z);
-                            if (block.getType() == Material.AIR) {
+                            if (!block.isSolid()) {
                                 block.setType(Material.WATER, false);
                             }
                         }
