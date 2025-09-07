@@ -6,7 +6,6 @@ import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.plugin.Plugin;
@@ -17,11 +16,16 @@ public class FloodedWorld extends CustomChallenge {
         super(plugin, "Atlantis");
     }
 
+    private static final int FLOOD_Y_LEVEL = 96;
+
     @Override
     protected void onActivate() {
-        CommandSender console = plugin.getServer().getConsoleSender();
-        plugin.getServer().dispatchCommand(console, "worldreset light");
-
+        World world = plugin.getServer().getWorld("game_overworld");
+        assert world != null;
+        Chunk[] chunks = world.getLoadedChunks();
+        for (Chunk chunk : chunks) {
+            floodChunk(chunk, world);
+        }
     }
 
     @Override
@@ -29,31 +33,33 @@ public class FloodedWorld extends CustomChallenge {
 
     }
 
-    private static final int FLOOD_Y_LEVEL = 96;
-
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
         Chunk chunk = event.getChunk();
         World world = chunk.getWorld();
 
-        if (world.getEnvironment() != World.Environment.NORMAL || WorldManager.lobbyWorld == world || !event.isNewChunk()){
+        if (world.getEnvironment() != World.Environment.NORMAL || WorldManager.lobbyWorld == world || !event.isNewChunk()) {
             return;
         }
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        for (int y = FLOOD_Y_LEVEL; y > world.getMinHeight(); y--) {
-                            Block block = chunk.getBlock(x, y, z);
-                            if (!block.isSolid()) {
-                                block.setType(Material.WATER, false);
-                            }
-                        }
+                floodChunk(chunk, world);
+            }
+        }.runTask(plugin);
+    }
+
+    private static void floodChunk(Chunk chunk, World world) {
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                for (int y = FLOOD_Y_LEVEL; y > world.getMinHeight(); y--) {
+                    Block block = chunk.getBlock(x, y, z);
+                    if (!block.isSolid()) {
+                        block.setType(Material.WATER, false);
                     }
                 }
             }
-        }.runTask(plugin);
+        }
     }
 }
