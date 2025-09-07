@@ -46,10 +46,6 @@ public abstract class CustomChallenge implements Listener {
         }
     }
 
-    public void loseChallenge() {
-
-    }
-
     // Von Unterklassen überschreiben
     protected abstract void onActivate();
 
