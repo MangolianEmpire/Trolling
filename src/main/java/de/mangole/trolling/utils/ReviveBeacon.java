@@ -1,6 +1,5 @@
 package de.mangole.trolling.utils;
 
-import de.mangole.trolling.GameManager;
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.events.GameFortniteListener;
 import net.kyori.adventure.text.Component;
@@ -8,7 +7,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Beacon;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
@@ -18,10 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -61,17 +56,20 @@ public class ReviveBeacon implements Listener {
                 period = 5;
             }
         }
+
+        Location loc = block.getLocation().clone().add(0.5, 1, 0.5);
+        if (progressDisplay == null || progressDisplay.isDead()) {
+            progressDisplay = block.getWorld().spawn(loc, TextDisplay.class, textDisplay -> {
+                textDisplay.setBillboard(Display.Billboard.VERTICAL);
+                textDisplay.setBackgroundColor(Color.GREEN);
+            });
+        }
+
         return new BukkitRunnable() {
             long counter = 0;
+
             @Override
             public void run() {
-                Location loc = block.getLocation().clone().add(0.5, 1, 0.5);
-                if (progressDisplay == null || progressDisplay.isDead()) {
-                    progressDisplay = block.getWorld().spawn(loc, TextDisplay.class, textDisplay -> {
-                        textDisplay.setBillboard(Display.Billboard.VERTICAL);
-                        textDisplay.setBackgroundColor(Color.GREEN);
-                    });
-                }
 
                 updateReviveProgressText();
 

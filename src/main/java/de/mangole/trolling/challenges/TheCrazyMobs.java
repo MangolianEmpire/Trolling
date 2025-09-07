@@ -8,17 +8,17 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.*;
 import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Random;
 
 public class TheCrazyMobs extends CustomChallenge {
 
-    public TheCrazyMobs(Plugin plugin) {
-        super(plugin, "TheCrazyMobs");
+    public TheCrazyMobs(Trolling trolling) {
+        super(trolling, "TheCrazyMobs");
     }
 
     @Override
@@ -31,9 +31,8 @@ public class TheCrazyMobs extends CustomChallenge {
 
     @EventHandler
     public void onCreeperExplode(EntityExplodeEvent event) {
-        if (!(event.getEntity() instanceof Creeper)) return;
+        if (!(event.getEntity() instanceof Creeper creeper)) return;
 
-        Creeper creeper = (Creeper) event.getEntity();
         Location explosionLoc = creeper.getLocation();
 
         double radius = 10.0;
@@ -56,30 +55,35 @@ public class TheCrazyMobs extends CustomChallenge {
     public void onSkeletonShoot(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Skeleton skeleton)) return;
 
-        final int[] count = {0};
-        Bukkit.getScheduler().runTaskTimer(Trolling.plugin, task -> {
-            skeleton.launchProjectile(Arrow.class);
-            count[0]++;
-            if (count[0] >= 5) {
-                task.cancel();
+        new BukkitRunnable() {
+            int count = 0;
+
+            @Override
+            public void run() {
+                skeleton.launchProjectile(Arrow.class);
+                count++;
+                if (count >= 4) {
+                    cancel();
+                }
             }
-        }, 4L, 4L);
+        }.runTaskTimer(trolling, 5L, 5L);
     }
 
     @EventHandler
     public void onZombieDeath(EntityDeathEvent event) {
         if (!(event.getEntity() instanceof Zombie zombie)) return;
-        if (zombie.isBaby()) return;
+        if (!zombie.isAdult()) return;
 
         World world = zombie.getWorld();
         Location location = zombie.getLocation();
         Random random = new Random();
-        int zombie_amount = random.nextInt(4);
-        zombie_amount = Math.max(zombie_amount, 2);
+        int zombie_amount = random.nextInt(3);
+        zombie_amount = zombie_amount + 2;
         for (int i = 0; i < zombie_amount; i++) {
             Zombie baby = (Zombie) world.spawnEntity(location, EntityType.ZOMBIE);
-            baby.setBaby(true);
+            baby.setBaby();
             baby.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 4));
+            baby.setHealth(1);
         }
     }
 
@@ -144,7 +148,7 @@ public class TheCrazyMobs extends CustomChallenge {
 
         Random random = new Random();
 
-        if (random.nextDouble() < 0.3) {
+        if (random.nextDouble() < 0.2) {
             Location loc = sheep.getLocation().clone();
             World world = sheep.getWorld();
 
@@ -161,6 +165,19 @@ public class TheCrazyMobs extends CustomChallenge {
                 tnt.setFuseTicks(40); // 3 Sekunden bis Explosion (20 Ticks = 1 Sekunde)
                 tnt.setVelocity(dir.multiply(0.5)); // Stärke anpassen, z.B. 0.5 für "nicht so weit"
             }
+        }
+    }
+
+    @EventHandler
+    public void onCowDeath(EntityDeathEvent event) {
+        if (!(event.getEntity() instanceof Cow cow)) return;
+
+        Random random = new Random();
+
+        if (random.nextDouble() < 0.3) {
+            event.setCancelled(true);
+            cow.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 300, 1));
+            cow.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 300, 2));
         }
     }
 

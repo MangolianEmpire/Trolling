@@ -1,5 +1,6 @@
 package de.mangole.trolling.challenges;
 
+import de.mangole.trolling.Trolling;
 import de.mangole.trolling.utils.CustomChallenge;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -11,8 +12,8 @@ import org.bukkit.plugin.Plugin;
 
 public class Communism extends CustomChallenge {
 
-    public Communism(Plugin plugin) {
-        super(plugin, "Communism");
+    public Communism(Trolling trolling) {
+        super(trolling, "Communism");
     }
 
     @Override
@@ -27,7 +28,7 @@ public class Communism extends CustomChallenge {
     public void onDamage(EntityDamageEvent e) {
         if (!(e.getEntity() instanceof Player player)) return;
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Bukkit.getScheduler().runTaskLater(trolling, () -> {
             double newHealth = player.getHealth();
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (p != player) {
@@ -41,7 +42,7 @@ public class Communism extends CustomChallenge {
     public void onFoodChange(FoodLevelChangeEvent e) {
         if (!(e.getEntity() instanceof Player player)) return;
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Bukkit.getScheduler().runTaskLater(trolling, () -> {
             int newFood = player.getFoodLevel();
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (p != player) {

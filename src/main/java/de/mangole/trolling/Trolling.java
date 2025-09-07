@@ -1,6 +1,9 @@
 package de.mangole.trolling;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import de.mangole.trolling.challenges.ChallengeLoader;
+import de.mangole.trolling.commands.ChallengeEdit;
 import de.mangole.trolling.commands.GameChange;
 import de.mangole.trolling.commands.WorldCommand;
 import de.mangole.trolling.commands.WorldReset;
@@ -18,6 +21,7 @@ public class Trolling extends JavaPlugin {
     private WorldManager worldManager;
     private ChallengeLoader challengeLoader;
     private TimeCounter timer;
+    private ProtocolManager protocolManager;
     public static Plugin plugin;
 
     @Override
@@ -33,6 +37,7 @@ public class Trolling extends JavaPlugin {
         this.challengeLoader = new ChallengeLoader(this);
         this.data = new Data(this);
         this.timer = new TimeCounter(this);
+        this.protocolManager = ProtocolLibrary.getProtocolManager();
 
         registerEvents();
         registerCommands();
@@ -64,6 +69,7 @@ public class Trolling extends JavaPlugin {
         getCommand("world").setExecutor(new WorldCommand());
         getCommand("worldreset").setExecutor(new WorldReset());
         getCommand("gamechange").setExecutor(new GameChange(this));
+        getCommand("challengeedit").setExecutor(new ChallengeEdit(this));
     }
 
     public Data getData() {
@@ -80,6 +86,10 @@ public class Trolling extends JavaPlugin {
 
     public TimeCounter getTimer() {
         return this.timer;
+    }
+
+    public ProtocolManager getProtocolManager() {
+        return protocolManager;
     }
 }
 

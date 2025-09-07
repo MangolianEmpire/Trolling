@@ -1,5 +1,6 @@
 package de.mangole.trolling.challenges;
 
+import de.mangole.trolling.Trolling;
 import de.mangole.trolling.WorldManager;
 import de.mangole.trolling.utils.CustomChallenge;
 import org.bukkit.Chunk;
@@ -8,19 +9,18 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class FloodedWorld extends CustomChallenge {
-    public FloodedWorld(Plugin plugin) {
-        super(plugin, "Atlantis");
+    public FloodedWorld(Trolling trolling) {
+        super(trolling, "Atlantis");
     }
 
     private static final int FLOOD_Y_LEVEL = 96;
 
     @Override
     protected void onActivate() {
-        World world = plugin.getServer().getWorld("game_overworld");
+        World world = trolling.getServer().getWorld("game_overworld");
         assert world != null;
         Chunk[] chunks = world.getLoadedChunks();
         for (Chunk chunk : chunks) {
@@ -47,7 +47,7 @@ public class FloodedWorld extends CustomChallenge {
             public void run() {
                 floodChunk(chunk, world);
             }
-        }.runTask(plugin);
+        }.runTask(trolling);
     }
 
     private static void floodChunk(Chunk chunk, World world) {
