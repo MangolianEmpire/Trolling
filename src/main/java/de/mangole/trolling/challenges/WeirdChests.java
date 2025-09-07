@@ -47,7 +47,6 @@ public class WeirdChests extends CustomChallenge {
             event.setCancelled(true);
             ArrayList<Block> surroundingBlocks = new ArrayList<>();
 
-            // TODO: should be reworked
             for (int x = chest.getX() - 2; x <= chest.getX() + 2; x++) {
                 for (int z = chest.getZ() - 2; z <= chest.getZ() + 2; z++) {
                     for (int y = chest.getY() - 2; y <= chest.getY() + 2; y++) {

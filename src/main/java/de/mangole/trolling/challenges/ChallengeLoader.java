@@ -8,10 +8,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -102,14 +98,14 @@ public class ChallengeLoader {
                 hardcore
         ));
 
-        RenderDistance renderDistance = new RenderDistance(trolling);
-        challenges.add(renderDistance);
+        Shortsightedness shortsightedness = new Shortsightedness(trolling);
+        challenges.add(shortsightedness);
 
         customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
                 Material.SPYGLASS,
-                Component.text("Chris' Render Distance", NamedTextColor.BLACK),
+                Component.text("Chris' normal vision", NamedTextColor.BLACK),
                 Component.text("Where tf are my glasses", NamedTextColor.BLACK),
-                renderDistance
+                shortsightedness
         ));
 
         // active saved challenges

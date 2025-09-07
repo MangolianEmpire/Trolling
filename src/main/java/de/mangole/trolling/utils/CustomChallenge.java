@@ -4,7 +4,6 @@ import de.mangole.trolling.Trolling;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
 
 public abstract class CustomChallenge implements Listener {
 
