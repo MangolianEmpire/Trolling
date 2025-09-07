@@ -109,17 +109,15 @@ public class ChallengeLoader {
         ));
 
         // FloodedWorld
-        FloodedWorld floodedWorld = new FloodedWorld(plugin);
+        FloodedWorld floodedWorld = new FloodedWorld(trolling);
         challenges.add(floodedWorld);
 
-        ItemStack floodedWorldItemStack = new ItemStack(Material.TROPICAL_FISH_BUCKET);
-        ItemMeta floodedWorldItemMeta = floodedWorldItemStack.getItemMeta();
-        floodedWorldItemMeta.displayName(Component.text("Atlantis", NamedTextColor.BLUE));
-        floodedWorldItemMeta.lore(List.of(Component.text("Klimaerwärmung kickt hart", NamedTextColor.BLUE)));
-        floodedWorldItemStack.setItemMeta(floodedWorldItemMeta);
-        CustomChallengeItem floodedWorldItem = new CustomChallengeItem(floodedWorldItemStack, floodedWorld);
-        customChallengeItems.add(floodedWorldItem);
-
+        customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
+                Material.TROPICAL_FISH_BUCKET,
+                Component.text("Atlantis", NamedTextColor.BLUE),
+                Component.text("Climate Change kicks your balls", NamedTextColor.BLUE),
+                floodedWorld
+        ));
 
         // active saved challenges
         for (CustomChallenge challenge : challenges) {

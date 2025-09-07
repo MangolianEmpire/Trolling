@@ -1,14 +1,12 @@
 package de.mangole.trolling.utils;
 
+import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.ChunkCoordIntPair;
-import com.comphenix.protocol.PacketType;
 import de.mangole.trolling.Trolling;
-import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 public class ChunkPacketUtils {
 

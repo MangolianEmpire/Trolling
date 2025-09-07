@@ -8,7 +8,6 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.*;
 import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -32,9 +31,8 @@ public class TheCrazyMobs extends CustomChallenge {
 
     @EventHandler
     public void onCreeperExplode(EntityExplodeEvent event) {
-        if (!(event.getEntity() instanceof Creeper)) return;
+        if (!(event.getEntity() instanceof Creeper creeper)) return;
 
-        Creeper creeper = (Creeper) event.getEntity();
         Location explosionLoc = creeper.getLocation();
 
         double radius = 10.0;
@@ -74,7 +72,7 @@ public class TheCrazyMobs extends CustomChallenge {
     @EventHandler
     public void onZombieDeath(EntityDeathEvent event) {
         if (!(event.getEntity() instanceof Zombie zombie)) return;
-        if (zombie.isBaby()) return;
+        if (!zombie.isAdult()) return;
 
         World world = zombie.getWorld();
         Location location = zombie.getLocation();
@@ -83,7 +81,7 @@ public class TheCrazyMobs extends CustomChallenge {
         zombie_amount = zombie_amount + 2;
         for (int i = 0; i < zombie_amount; i++) {
             Zombie baby = (Zombie) world.spawnEntity(location, EntityType.ZOMBIE);
-            baby.setBaby(true);
+            baby.setBaby();
             baby.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 4));
             baby.setHealth(1);
         }
