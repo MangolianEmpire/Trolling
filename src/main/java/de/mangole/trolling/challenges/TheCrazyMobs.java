@@ -11,6 +11,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Random;
@@ -202,18 +203,15 @@ public class TheCrazyMobs extends CustomChallenge {
     @EventHandler
     public void onGolemMove(EntityMoveEvent event) {
         if (!(event.getEntity() instanceof IronGolem golem)) return;
-//        Bukkit.getScheduler().runTaskTimer(Trolling.plugin, task -> {
         if (golem.isDead() || !golem.isValid()) {
             return;
         }
-        golem.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 4));
+        golem.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
         Player target = getNearestPlayer(golem);
         if (target != null) {
             golem.setTarget(target);
         }
-//        }, 0L, 40L);
     }
-
     private Player getNearestPlayer(LivingEntity golem) {
         double nearestDistance = Double.MAX_VALUE;
         Player nearestPlayer = null;

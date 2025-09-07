@@ -6,6 +6,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.plugin.Plugin;
@@ -18,6 +19,8 @@ public class FloodedWorld extends CustomChallenge {
 
     @Override
     protected void onActivate() {
+        CommandSender console = plugin.getServer().getConsoleSender();
+        plugin.getServer().dispatchCommand(console, "worldreset light");
 
     }
 
@@ -33,7 +36,7 @@ public class FloodedWorld extends CustomChallenge {
         Chunk chunk = event.getChunk();
         World world = chunk.getWorld();
 
-        if (world.getEnvironment() != World.Environment.NORMAL || WorldManager.lobbyWorld == world){
+        if (world.getEnvironment() != World.Environment.NORMAL || WorldManager.lobbyWorld == world || !event.isNewChunk()){
             return;
         }
 
