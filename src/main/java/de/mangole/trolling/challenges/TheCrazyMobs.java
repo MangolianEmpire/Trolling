@@ -216,7 +216,7 @@ public class TheCrazyMobs extends CustomChallenge {
         Player nearestPlayer = null;
 
         for (Player player : golem.getWorld().getPlayers()) {
-            if (!player.isDead()) {
+            if (!player.isDead() && (player.getGameMode() == GameMode.SURVIVAL)) {
                 double distance = player.getLocation().distanceSquared(golem.getLocation());
                 if (distance < nearestDistance) {
                     nearestDistance = distance;
