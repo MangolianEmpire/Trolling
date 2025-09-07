@@ -2,10 +2,13 @@ package de.mangole.trolling.challenges;
 
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.utils.CustomChallenge;
+import io.papermc.paper.event.entity.EntityMoveEvent;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.*;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -178,6 +181,70 @@ public class TheCrazyMobs extends CustomChallenge {
             cow.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 300, 1));
             cow.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 300, 2));
         }
+    }
+
+    @EventHandler
+    public void onChickenDeath(EntityDeathEvent event) {
+        if (event.getEntityType() != EntityType.CHICKEN) return;
+        Location loc = event.getEntity().getLocation();
+
+        double radius = 3.0;
+        double knockback_strength = 3.0;
+        double damage = 6.0;
+
+        Firework firework = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK_ROCKET);
+        FireworkMeta meta = firework.getFireworkMeta();
+        meta.addEffect(FireworkEffect.builder()
+                .withColor(Color.WHITE)
+                .with(FireworkEffect.Type.BALL)
+                .build());
+        meta.setPower(0);
+        firework.setFireworkMeta(meta);
+        firework.detonate();
+
+
+        loc.getWorld().getNearbyEntities(loc, radius, radius, radius).forEach(entity -> {
+            if (entity != event.getEntity()) {
+                if (entity instanceof LivingEntity) {
+                    ((LivingEntity) entity).damage(damage);
+                }
+                Vector direction = entity.getLocation().toVector().subtract(loc.toVector());
+                if (direction.lengthSquared() > 0.0001) { // avoid zero-length vectors
+                    Vector knockback = direction.normalize().multiply(knockback_strength);
+                    entity.setVelocity(entity.getVelocity().add(knockback));
+                }
+            }
+        });
+
+    }
+
+    @EventHandler
+    public void onGolemMove(EntityMoveEvent event) {
+        if (!(event.getEntity() instanceof IronGolem golem)) return;
+        if (golem.isDead() || !golem.isValid()) {
+            return;
+        }
+        golem.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
+        Player target = getNearestPlayer(golem);
+        if (target != null) {
+            golem.setTarget(target);
+        }
+    }
+    private Player getNearestPlayer(LivingEntity golem) {
+        double nearestDistance = Double.MAX_VALUE;
+        Player nearestPlayer = null;
+
+        for (Player player : golem.getWorld().getPlayers()) {
+            if (!player.isDead() && (player.getGameMode() == GameMode.SURVIVAL)) {
+                double distance = player.getLocation().distanceSquared(golem.getLocation());
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearestPlayer = player;
+                }
+            }
+        }
+
+        return nearestPlayer;
     }
 
 }

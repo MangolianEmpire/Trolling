@@ -108,6 +108,19 @@ public class ChallengeLoader {
                 shortsightedness
         ));
 
+        // FloodedWorld
+        FloodedWorld floodedWorld = new FloodedWorld(plugin);
+        challenges.add(floodedWorld);
+
+        ItemStack floodedWorldItemStack = new ItemStack(Material.TROPICAL_FISH_BUCKET);
+        ItemMeta floodedWorldItemMeta = floodedWorldItemStack.getItemMeta();
+        floodedWorldItemMeta.displayName(Component.text("Atlantis", NamedTextColor.BLUE));
+        floodedWorldItemMeta.lore(List.of(Component.text("Klimaerwärmung kickt hart", NamedTextColor.BLUE)));
+        floodedWorldItemStack.setItemMeta(floodedWorldItemMeta);
+        CustomChallengeItem floodedWorldItem = new CustomChallengeItem(floodedWorldItemStack, floodedWorld);
+        customChallengeItems.add(floodedWorldItem);
+
+
         // active saved challenges
         for (CustomChallenge challenge : challenges) {
             boolean active = config.getBoolean("challenges." + challenge.getChallengeName(), false);
