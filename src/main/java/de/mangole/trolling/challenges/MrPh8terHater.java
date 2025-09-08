@@ -11,12 +11,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
-import org.bukkit.event.weather.WeatherEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Random;
 
@@ -71,18 +70,23 @@ public class MrPh8terHater extends CustomChallenge {
         }
     }
 
-//    TODO: nicht ganz koscher
-//    @EventHandler
-//    public void onLightningStrike(LightningStrikeEvent event) {
-//        if (new Random().nextDouble() > 0.5) return;
-//        World world = event.getWorld();
-//        Player target = Bukkit.getPlayerExact(VICTIM_NAME);
-//        if (target != null && target.getWorld().equals(world)) {
-//            event.setCancelled(true);
-//            Location loc = target.getLocation();
-//            world.strikeLightning(loc);
-//        }
-//    }
+    @EventHandler
+    public void onLightningStrike(LightningStrikeEvent event) {
+        if (event.getLightning().hasMetadata("customStrike")) return; // ignore custom strikes
+
+        if (new Random().nextDouble() > 0.4) return;
+
+        Player target = Bukkit.getPlayerExact(VICTIM_NAME);
+        if (target != null && target.getWorld().equals(event.getWorld())) {
+            event.setCancelled(true);
+            strikeCustomLightning(target.getWorld(), target.getLocation());
+        }
+    }
+
+    private void strikeCustomLightning(World world, Location loc) {
+        LightningStrike lightning = world.strikeLightning(loc);
+        lightning.setMetadata("customStrike", new FixedMetadataValue(trolling, true));
+    }
 
 
     private void degradeToolInHand(Player player) {
