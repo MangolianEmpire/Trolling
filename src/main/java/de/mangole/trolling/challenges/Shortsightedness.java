@@ -32,7 +32,7 @@ public class Shortsightedness extends CustomChallenge {
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.setViewDistance(12);
             player.setSendViewDistance(12);
-            player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 0, 0));
+            player.clearActivePotionEffects();
         }
     }
 

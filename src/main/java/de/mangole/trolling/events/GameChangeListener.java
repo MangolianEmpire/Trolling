@@ -1,6 +1,7 @@
 package de.mangole.trolling.events;
 
 import de.mangole.trolling.*;
+import de.mangole.trolling.utils.PlayerInitUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -15,9 +16,11 @@ import org.bukkit.scoreboard.Scoreboard;
 public class GameChangeListener implements Listener {
 
     private final Trolling trolling;
+    private final GameManager gameManager;
 
     public GameChangeListener(final Trolling trolling) {
         this.trolling = trolling;
+        this.gameManager = trolling.getGameManager();
     }
 
     @EventHandler
@@ -30,11 +33,7 @@ public class GameChangeListener implements Listener {
         if (oldStatus == GameStatus.LOBBY && newStatus == GameStatus.RUNNING) {
             World gameOverWorld = Bukkit.getWorld("game_overworld");
             Bukkit.getWorlds().forEach(world -> {world.setDifficulty(Difficulty.HARD);});
-            Bukkit.getOnlinePlayers().forEach(player -> {
-                player.getInventory().clear();
-                player.teleport(gameOverWorld.getSpawnLocation());
-                player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1F);
-            });
+            Bukkit.getOnlinePlayers().forEach(PlayerInitUtils::initPlayerGame);
             gameOverWorld.setTime(1000);
             gameOverWorld.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
         }
@@ -42,18 +41,8 @@ public class GameChangeListener implements Listener {
         if (newStatus == GameStatus.LOBBY) {
             trolling.getServer().getScheduler().cancelTasks(trolling);
             Bukkit.getOnlinePlayers().forEach(player -> {
-                player.getInventory().clear();
-                player.getInventory().setItem(0, Data.lobbySpawnTeleporter);
-                player.getInventory().setItem(4, Data.lobbySettings);
-                player.getInventory().setItem(8, Data.lobbyGameModeChanger);
-                player.setHealth(20);
-                player.setFoodLevel(20);
-                player.setExperienceLevelAndProgress(0);
-                player.teleport(WorldManager.lobbySpawn);
-                player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1F);
-                player.clearActivePotionEffects();
-                Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "/advancement revoke " + player.getName() + " everything");
-                if (GameManager.gameMode == de.mangole.trolling.GameMode.CREATIVE) {
+                PlayerInitUtils.initPlayerLobby(player);
+                if (gameManager.getGameMode() == de.mangole.trolling.GameMode.CREATIVE) {
                     player.setGameMode(GameMode.CREATIVE);
                 } else {
                     player.setGameMode(GameMode.SURVIVAL);
@@ -81,8 +70,8 @@ public class GameChangeListener implements Listener {
             trolling.getServer().getScheduler().runTaskLater(trolling, new Runnable() {
                 @Override
                 public void run() {
-                    if (GameManager.gameStatus == GameStatus.LOST) {
-                        trolling.getGameManager().stopGame();
+                    if (gameManager.getGameStatus() == GameStatus.LOST) {
+                        gameManager.stopGame();
                     }
                 }
             }, 20 * 60);

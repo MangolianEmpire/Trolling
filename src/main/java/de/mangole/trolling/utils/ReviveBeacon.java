@@ -1,7 +1,7 @@
 package de.mangole.trolling.utils;
 
 import de.mangole.trolling.Trolling;
-import de.mangole.trolling.events.GameFortniteListener;
+import de.mangole.trolling.gamemodes.GameModeFortnite;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
@@ -30,6 +30,7 @@ public class ReviveBeacon implements Listener {
     private final Material oldBlock;
     private final Block block;
     private final BukkitTask reviveTask;
+    private final BukkitTask beamTask;
     private TextDisplay progressDisplay;
 
     public ReviveBeacon(Trolling trolling, Player revivePlayer, int reviveRange, int reviveDuration, Block block) {
@@ -46,6 +47,20 @@ public class ReviveBeacon implements Listener {
         beacon.update();
 
         reviveTask = reviveTask();
+        beamTask = beamTask();
+    }
+
+    private BukkitTask beamTask() {
+        return new BukkitRunnable() {
+            @Override
+            public void run() {
+                Location loc = block.getLocation().add(0.5, 1, 0.5);
+                for (double y = 0; y < 20; y += 0.5) {
+                    loc.getWorld().spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, loc.clone().add(0, y, 0), 1, 0, 0, 0, 0);
+                }
+            }
+        }.runTaskTimer(trolling, 0, 20);
+
     }
 
 
@@ -132,6 +147,8 @@ public class ReviveBeacon implements Listener {
     private void revivePlayer() {
         revivePlayer.setSpectatorTarget(null);
         revivePlayer.teleport(block.getLocation());
+        revivePlayer.clearActivePotionEffects();
+        revivePlayer.getInventory().clear();
         revivePlayer.setGameMode(GameMode.SURVIVAL);
         World world = block.getWorld();
         world.playSound(block.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
@@ -148,7 +165,11 @@ public class ReviveBeacon implements Listener {
             reviveTask.cancel();
         }
 
-        GameFortniteListener.reviveBeacons.remove(this);
+        if (beamTask != null && !beamTask.isCancelled()) {
+            beamTask.cancel();
+        }
+
+        GameModeFortnite.reviveBeacons.remove(this);
     }
 
     public Player getRevivePlayer() {
