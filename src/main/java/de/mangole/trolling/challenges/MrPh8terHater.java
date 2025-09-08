@@ -2,9 +2,23 @@ package de.mangole.trolling.challenges;
 
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.utils.CustomChallenge;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.weather.LightningStrikeEvent;
+import org.bukkit.event.weather.WeatherEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.Random;
 
 public class MrPh8terHater extends CustomChallenge {
 
@@ -24,13 +38,66 @@ public class MrPh8terHater extends CustomChallenge {
 
     }
 
+    // Takes more damage
     @EventHandler
     public void onEntitydamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player player) {
             if (player.getName().equals(VICTIM_NAME)) {
-                double newDamage = event.getDamage() * 2.0;
+                double newDamage = event.getDamage() * 1.2;
                 event.setDamage(newDamage);
             }
         }
+    }
+
+    // Degrades tools faster when breaking blocks
+    @EventHandler
+    public void onPlayerUseTool(BlockBreakEvent event) {
+        if (new Random().nextDouble() > 0.3) return;
+        degradeToolInHand(event.getPlayer());
+    }
+
+    // Deals less damage and degrade weapons faster
+    @EventHandler
+    public void onEntitydamage(EntityDamageByEntityEvent event) {
+        if (new Random().nextDouble() > 0.3) return;
+        if (event.getDamager() instanceof Player damager) {
+
+            if (damager.getName().equals(VICTIM_NAME)) {
+                double originalDamage = event.getDamage();
+                double reducedDamage = originalDamage * 0.8;
+                event.setDamage(reducedDamage);
+                degradeToolInHand(damager);
+            }
+        }
+    }
+
+//    TODO: nicht ganz koscher
+//    @EventHandler
+//    public void onLightningStrike(LightningStrikeEvent event) {
+//        if (new Random().nextDouble() > 0.5) return;
+//        World world = event.getWorld();
+//        Player target = Bukkit.getPlayerExact(VICTIM_NAME);
+//        if (target != null && target.getWorld().equals(world)) {
+//            event.setCancelled(true);
+//            Location loc = target.getLocation();
+//            world.strikeLightning(loc);
+//        }
+//    }
+
+
+    private void degradeToolInHand(Player player) {
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (player.getName().equals(VICTIM_NAME) && hasDurability(item)) {
+            Damageable damageableMeta = (Damageable) item.getItemMeta();
+            damageableMeta.setDamage(damageableMeta.getDamage() + 1);
+            item.setItemMeta(damageableMeta);
+        }
+    }
+
+    private boolean hasDurability(ItemStack item) {
+        if (item == null || item.getType().isAir()) return false;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return false;
+        return meta instanceof Damageable;
     }
 }
