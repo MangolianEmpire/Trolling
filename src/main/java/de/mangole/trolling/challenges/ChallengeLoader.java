@@ -119,6 +119,11 @@ public class ChallengeLoader {
                 floodedWorld
         ));
 
+        // MrPh8terHater
+        MrPh8terHater mrPh8terHater = new MrPh8terHater(trolling);
+        mrPh8terHater.activate();
+        challenges.add(mrPh8terHater);
+
         // active saved challenges
         for (CustomChallenge challenge : challenges) {
             boolean active = config.getBoolean("challenges." + challenge.getChallengeName(), false);
