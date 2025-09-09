@@ -11,6 +11,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
@@ -80,6 +82,28 @@ public class MrPh8terHater extends CustomChallenge {
         if (target != null && target.getWorld().equals(event.getWorld())) {
             event.setCancelled(true);
             strikeCustomLightning(target.getWorld(), target.getLocation());
+        }
+    }
+
+    @EventHandler
+    public void onRegen(EntityRegainHealthEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (player.getName().equalsIgnoreCase(VICTIM_NAME)) {
+            event.setAmount(event.getAmount() * 0.8);
+        }
+    }
+
+    @EventHandler
+    public void onHunger(FoodLevelChangeEvent event){
+        if (new Random().nextDouble() > 0.2) return;
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (!player.getName().equalsIgnoreCase(VICTIM_NAME)) return;
+
+        int oldLevel = player.getFoodLevel();
+        int newLevel = event.getFoodLevel();
+
+        if (newLevel < oldLevel) {
+            event.setFoodLevel(oldLevel + ((newLevel - oldLevel) * 2));
         }
     }
 
