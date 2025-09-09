@@ -76,18 +76,21 @@ public class WeirdChests extends CustomChallenge {
 
     @EventHandler
     public void onBarrelOpen(InventoryOpenEvent event) {
+        Random random = new Random();
+        if (random.nextDouble() > 0.1) return;
         Inventory inv = event.getInventory();
         if (inv.getLocation() != null) {
             var block = inv.getLocation().getBlock();
-            if (block.getType() == Material.BARREL){
+            if (block.getType() == Material.BARREL || block.getType() == Material.CHEST){
 
                 event.setCancelled(true);
 
                 Zombie mimicZombie = (Zombie) block.getWorld().spawnEntity(block.getLocation(), EntityType.ZOMBIE);
                 mimicZombie.setBaby();
                 mimicZombie.setInvisible(true);
-                mimicZombie.customName(Component.text("Barrel Mimic"));
+                mimicZombie.customName(Component.text("Mimic"));
                 mimicZombie.setCustomNameVisible(false);
+                mimicZombie.setShouldBurnInDay(false);
                 Player player = (Player) event.getPlayer();
                 mimicZombie.setTarget(player);
 
@@ -96,7 +99,7 @@ public class WeirdChests extends CustomChallenge {
                 barrelStand.setInvisible(true);
                 barrelStand.setGravity(false);
                 barrelStand.setMarker(true);
-                barrelStand.getEquipment().setHelmet(new ItemStack(Material.BARREL));
+                barrelStand.getEquipment().setHelmet(new ItemStack(block.getType()));
 
                 block.breakNaturally();
 
@@ -114,6 +117,8 @@ public class WeirdChests extends CustomChallenge {
             }
         }
     }
+
+
 
 
 }
