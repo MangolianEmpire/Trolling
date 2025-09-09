@@ -103,6 +103,7 @@ public class GameModeFortnite extends GameModeBase {
 
         if (target == null) {
             ReviveBeacon beacon = getReviveBeacon(spectator);
+            assert beacon != null;
             Location beaconLocation = beacon.getReviveLocation();
             if (to.distance(beaconLocation) > 100) {
                 spectator.teleport(beaconLocation);

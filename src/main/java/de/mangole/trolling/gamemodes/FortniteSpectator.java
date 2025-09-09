@@ -13,8 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +37,7 @@ public class FortniteSpectator {
         player.setHealth(20);
         player.setGameMode(GameMode.CREATIVE);
         player.setAllowFlight(true);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false, false));
+        player.setInvisible(true);
         player.setCollidable(false);
         player.getInventory().setItem(0, spectatingCompass);
         player.getInventory().setHelmet(new ItemStack(Material.SKELETON_SKULL));
@@ -52,6 +50,7 @@ public class FortniteSpectator {
         player.getInventory().clear();
         player.setHealth(20);
         player.setGameMode(GameMode.SURVIVAL);
+        player.setInvisible(false);
         player.setAllowFlight(false);
         player.setCollidable(true);
         spectators.remove(player);

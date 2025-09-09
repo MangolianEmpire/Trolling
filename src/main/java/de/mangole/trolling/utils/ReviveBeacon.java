@@ -16,6 +16,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -110,7 +111,7 @@ public class ReviveBeacon implements Listener {
         World world = block.getWorld();
         Location location = block.getLocation();
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getWorld().equals(world) && !player.equals(revivePlayer) && !player.getGameMode().equals(GameMode.SPECTATOR)) {
+            if (player.getWorld().equals(world) && !player.equals(revivePlayer) && player.getGameMode().equals(GameMode.SURVIVAL)) {
                 if (player.getLocation().distance(location) < reviveRange) {
                     numberPlayers++;
                 }
@@ -150,11 +151,12 @@ public class ReviveBeacon implements Listener {
         revivePlayer.setGameMode(GameMode.SURVIVAL);
         World world = block.getWorld();
         world.playSound(block.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
+        Bukkit.getPluginManager().callEvent(new PlayerRespawnEvent(revivePlayer, block.getLocation(), false, false, false, PlayerRespawnEvent.RespawnReason.PLUGIN));
     }
 
     public void cleanup() {
-        revivePlayer();
         block.setType(oldBlock);
+        revivePlayer();
         for (int i = 0; i < foundationMats.length; i++) {
             foundation[i].setType(foundationMats[i]);
         }
@@ -214,7 +216,8 @@ public class ReviveBeacon implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        if (event.getClickedBlock() != null && event.getClickedBlock().equals(block)) event.setCancelled(true);
+        if (event.getClickedBlock() == null) return;
+        if (event.getClickedBlock().equals(block)) event.setCancelled(true);
 
         for (Block value : foundation) {
             if (event.getClickedBlock().equals(value)) {
