@@ -8,18 +8,21 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class GameModeFortnite extends GameModeBase {
 
     public static ArrayList<ReviveBeacon> reviveBeacons = new ArrayList<>();
-    private FortniteSpectator fortniteSpectator;
+    private final FortniteSpectator fortniteSpectator;
 
     public GameModeFortnite(Trolling trolling) {
         super(trolling, GameMode.FORTNITE);
@@ -55,23 +58,77 @@ public class GameModeFortnite extends GameModeBase {
             fortniteSpectator.setFortniteSpectator(player);
             player.teleport(getReviveBeacon(player).getReviveLocation());
         } else if (gameManager.getGameStatus() == GameStatus.LOST) {
+            fortniteSpectator.resetFortniteSpectator(player);
             player.setGameMode(org.bukkit.GameMode.SPECTATOR);
         } else {
+            fortniteSpectator.resetFortniteSpectator(player);
             player.setGameMode(org.bukkit.GameMode.SURVIVAL);
         }
 
     }
 
     @GameModeEvent
-    public void onCustomClick(PlayerInteractEvent e) {
-        Player player = e.getPlayer();
-        ItemStack clicked = e.getItem();
+    public void onSpectatorInteract(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        ItemStack clicked = event.getItem();
 
-        if (e.getHand() != EquipmentSlot.HAND) return;
+        if (event.getHand() != EquipmentSlot.HAND) return;
 
-        if (clicked != null && clicked.equals(FortniteSpectator.spectatingCompass)) {
-            e.setCancelled(true);
+        if (clicked != null && clicked.equals(fortniteSpectator.getSpectatingCompass())) {
+            event.setCancelled(true);
             fortniteSpectator.getSpectatingInventory(player).open(player);
+        } else {
+            if (fortniteSpectator.getSpectators().contains(player)) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @GameModeEvent
+    public void onSpectatorInventory(InventoryClickEvent event) {
+        if (event.getClickedInventory() == null) return;
+        if (!(event.getClickedInventory().getHolder() instanceof Player spectator)) return;
+        if (fortniteSpectator.getSpectators().contains(spectator)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @GameModeEvent
+    public void onSpectatorMoveOutOfDistance(PlayerMoveEvent event) {
+        Player spectator = event.getPlayer();
+        if (!fortniteSpectator.getSpectators().contains(spectator)) return;
+
+        Player target = fortniteSpectator.getSpectatorTargets().get(spectator);
+        Location to = event.getTo();
+
+        if (target == null) {
+            ReviveBeacon beacon = getReviveBeacon(spectator);
+            Location beaconLocation = beacon.getReviveLocation();
+            if (to.distance(beaconLocation) > 100) {
+                spectator.teleport(beaconLocation);
+            }
+        } else {
+            if (to.distance(target.getLocation()) > 100) {
+                spectator.teleport(target);
+            }
+        }
+    }
+
+    @GameModeEvent
+    public void onTargetMoveOutOfDistance(PlayerMoveEvent event) {
+        Player target = event.getPlayer();
+        if (fortniteSpectator.getSpectators().contains(target)) return;
+
+        Map<Player, Player> spectatorTargets = fortniteSpectator.getSpectatorTargets();
+
+        if (fortniteSpectator.getSpectatorTargets().containsValue(target)) {
+            spectatorTargets.forEach((spectator, target2) -> {
+                if (!target.equals(target2)) {
+                    if (spectator.getLocation().distance(target2.getLocation()) > 100) {
+                        spectator.teleport(target2);
+                    }
+                }
+            });
         }
     }
 

@@ -5,7 +5,6 @@ import de.mangole.trolling.gamemodes.GameModeFortnite;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
-import org.bukkit.block.Beacon;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
@@ -29,8 +28,9 @@ public class ReviveBeacon implements Listener {
     private final int reviveDuration;
     private final Material oldBlock;
     private final Block block;
+    private final Block[] foundation;
+    private final Material[] foundationMats;
     private final BukkitTask reviveTask;
-    private final BukkitTask beamTask;
     private TextDisplay progressDisplay;
 
     public ReviveBeacon(Trolling trolling, Player revivePlayer, int reviveRange, int reviveDuration, Block block) {
@@ -41,26 +41,24 @@ public class ReviveBeacon implements Listener {
         this.block = block;
 
         Bukkit.getPluginManager().registerEvents(this, trolling);
+
         oldBlock = block.getType();
         block.setType(Material.BEACON);
-        Beacon beacon = (Beacon) block.getState();
-        beacon.update();
+        foundation = new Block[9];
+        foundationMats = new Material[9];
+        int i = 0;
+        for (int x = block.getX() - 1; x <= block.getX() + 1; x++) {
+            for (int z = block.getZ() - 1; z <= block.getZ() + 1; z++) {
+                Block foundationBlock = block.getWorld().getBlockAt(x, block.getY() - 1, z);
+                foundation[i] = foundationBlock;
+                Material oldMat = foundationBlock.getType();
+                foundationMats[i] = oldMat;
+                foundationBlock.setType(Material.IRON_BLOCK);
+                i++;
+            }
+        }
 
         reviveTask = reviveTask();
-        beamTask = beamTask();
-    }
-
-    private BukkitTask beamTask() {
-        return new BukkitRunnable() {
-            @Override
-            public void run() {
-                Location loc = block.getLocation().add(0.5, 1, 0.5);
-                for (double y = 0; y < 20; y += 0.5) {
-                    loc.getWorld().spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, loc.clone().add(0, y, 0), 1, 0, 0, 0, 0);
-                }
-            }
-        }.runTaskTimer(trolling, 0, 20);
-
     }
 
 
@@ -69,6 +67,7 @@ public class ReviveBeacon implements Listener {
         for (CustomChallenge challenge : trolling.getChallengeLoader().getCustomChallenges()) {
             if (challenge.getChallengeName().equals("FasterMinecraft") && challenge.isActive()) {
                 period = 5;
+                break;
             }
         }
 
@@ -145,7 +144,6 @@ public class ReviveBeacon implements Listener {
     }
 
     private void revivePlayer() {
-        revivePlayer.setSpectatorTarget(null);
         revivePlayer.teleport(block.getLocation());
         revivePlayer.clearActivePotionEffects();
         revivePlayer.getInventory().clear();
@@ -157,6 +155,9 @@ public class ReviveBeacon implements Listener {
     public void cleanup() {
         revivePlayer();
         block.setType(oldBlock);
+        for (int i = 0; i < foundationMats.length; i++) {
+            foundation[i].setType(foundationMats[i]);
+        }
         progressDisplay.remove();
 
         HandlerList.unregisterAll(this);
@@ -165,9 +166,6 @@ public class ReviveBeacon implements Listener {
             reviveTask.cancel();
         }
 
-        if (beamTask != null && !beamTask.isCancelled()) {
-            beamTask.cancel();
-        }
 
         GameModeFortnite.reviveBeacons.remove(this);
     }
@@ -184,20 +182,44 @@ public class ReviveBeacon implements Listener {
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
         if (event.getBlock().equals(block)) event.setCancelled(true);
+
+        for (Block value : foundation) {
+            if (event.getBlock().equals(value)) {
+                event.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler
     public void onExplode(BlockExplodeEvent event) {
         if (event.getBlock().equals(block)) event.setCancelled(true);
+
+        for (Block value : foundation) {
+            if (event.getBlock().equals(value)) {
+                event.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler
     public void onBurn(BlockBurnEvent event) {
         if (event.getBlock().equals(block)) event.setCancelled(true);
+
+        for (Block value : foundation) {
+            if (event.getBlock().equals(value)) {
+                event.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         if (event.getClickedBlock() != null && event.getClickedBlock().equals(block)) event.setCancelled(true);
+
+        for (Block value : foundation) {
+            if (event.getClickedBlock().equals(value)) {
+                event.setCancelled(true);
+            }
+        }
     }
 }
