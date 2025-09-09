@@ -25,6 +25,8 @@ public class MrPh8terHater extends CustomChallenge {
 
     private static final String VICTIM_NAME = "Sergey898";
 
+    // Auskommentierter Code funktioniert noch nicht richtig
+
     public MrPh8terHater(Trolling trolling) {
         super(trolling, "MrPh8terHater");
     }
@@ -51,11 +53,11 @@ public class MrPh8terHater extends CustomChallenge {
     }
 
     // Degrades tools faster when breaking blocks
-    @EventHandler
-    public void onPlayerUseTool(BlockBreakEvent event) {
-        if (new Random().nextDouble() > 0.3) return;
-        degradeToolInHand(event.getPlayer());
-    }
+//    @EventHandler
+//    public void onPlayerUseTool(BlockBreakEvent event) {
+//        if (new Random().nextDouble() > 0.3) return;
+//        degradeToolInHand(event.getPlayer());
+//    }
 
     // Deals less damage and degrade weapons faster
     @EventHandler
@@ -67,7 +69,7 @@ public class MrPh8terHater extends CustomChallenge {
                 double originalDamage = event.getDamage();
                 double reducedDamage = originalDamage * 0.8;
                 event.setDamage(reducedDamage);
-                degradeToolInHand(damager);
+//                degradeToolInHand(damager);
             }
         }
     }
@@ -113,19 +115,19 @@ public class MrPh8terHater extends CustomChallenge {
     }
 
 
-    private void degradeToolInHand(Player player) {
-        ItemStack item = player.getInventory().getItemInMainHand();
-        if (player.getName().equals(VICTIM_NAME) && hasDurability(item)) {
-            Damageable damageableMeta = (Damageable) item.getItemMeta();
-            damageableMeta.setDamage(damageableMeta.getDamage() + 1);
-            item.setItemMeta(damageableMeta);
-        }
-    }
-
-    private boolean hasDurability(ItemStack item) {
-        if (item == null || item.getType().isAir()) return false;
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return false;
-        return meta instanceof Damageable;
-    }
+//    private void degradeToolInHand(Player player) {
+//        ItemStack item = player.getInventory().getItemInMainHand();
+//        if (player.getName().equals(VICTIM_NAME) && hasDurability(item)) {
+//            Damageable damageableMeta = (Damageable) item.getItemMeta();
+//            damageableMeta.setDamage(damageableMeta.getDamage() + 1);
+//            item.setItemMeta(damageableMeta);
+//        }
+//    }
+//
+//    private boolean hasDurability(ItemStack item) {
+//        if (item == null || item.getType().isAir()) return false;
+//        ItemMeta meta = item.getItemMeta();
+//        if (meta == null) return false;
+//        return meta instanceof Damageable;
+//    }
 }
