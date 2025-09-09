@@ -3,13 +3,22 @@ package de.mangole.trolling.challenges;
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.utils.ContainerUtils;
 import de.mangole.trolling.utils.CustomChallenge;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -63,6 +72,52 @@ public class WeirdChests extends CustomChallenge {
             ContainerUtils.swapBlockContainers(chest, surroundingBlocks.get(randomBlock), trolling);
         }
     }
+
+    @EventHandler
+    public void onBarrelOpen(InventoryOpenEvent event) {
+        Random random = new Random();
+        if (random.nextDouble() > 0.1) return;
+        Inventory inv = event.getInventory();
+        if (inv.getLocation() != null) {
+            var block = inv.getLocation().getBlock();
+            if (block.getType() == Material.BARREL || block.getType() == Material.CHEST){
+
+                event.setCancelled(true);
+
+                Zombie mimicZombie = (Zombie) block.getWorld().spawnEntity(block.getLocation(), EntityType.ZOMBIE);
+                mimicZombie.setBaby();
+                mimicZombie.setInvisible(true);
+                mimicZombie.customName(Component.text("Mimic"));
+                mimicZombie.setCustomNameVisible(false);
+                mimicZombie.setShouldBurnInDay(false);
+                Player player = (Player) event.getPlayer();
+                mimicZombie.setTarget(player);
+
+                ArmorStand barrelStand = (ArmorStand) block.getWorld()
+                        .spawnEntity(block.getLocation().add(0,0,0), EntityType.ARMOR_STAND);
+                barrelStand.setInvisible(true);
+                barrelStand.setGravity(false);
+                barrelStand.setMarker(true);
+                barrelStand.getEquipment().setHelmet(new ItemStack(block.getType()));
+
+                block.breakNaturally();
+
+                new BukkitRunnable(){
+                    @Override
+                    public void run(){
+                        if (!mimicZombie.isDead()){
+                            barrelStand.teleport(mimicZombie.getLocation().add(0,-1,0));
+                        } else {
+                            barrelStand.remove();
+                            this.cancel();
+                        }
+                    }
+                }.runTaskTimer(trolling, 0L, 1L);
+            }
+        }
+    }
+
+
 
 
 }
