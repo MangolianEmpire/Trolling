@@ -62,12 +62,11 @@ public class Trolling extends JavaPlugin {
         pluginManager.registerEvents(new GamePortalListener(this), this);
         pluginManager.registerEvents(new GameChangeListener(this), this);
         pluginManager.registerEvents(new GameLogicListener(this), this);
-        pluginManager.registerEvents(new GameFortniteListener(this), this);
     }
 
     private void registerCommands() {
-        getCommand("world").setExecutor(new WorldCommand());
-        getCommand("worldreset").setExecutor(new WorldReset());
+        getCommand("world").setExecutor(new WorldCommand(this));
+        getCommand("worldreset").setExecutor(new WorldReset(this));
         getCommand("gamechange").setExecutor(new GameChange(this));
         getCommand("challengeedit").setExecutor(new ChallengeEdit(this));
     }

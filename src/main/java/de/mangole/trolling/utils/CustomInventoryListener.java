@@ -4,6 +4,8 @@ import de.mangole.trolling.Data;
 import de.mangole.trolling.GameManager;
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.WorldManager;
+import de.mangole.trolling.gamemodes.FortniteSpectator;
+import de.mangole.trolling.gamemodes.GameModeFortnite;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.World;

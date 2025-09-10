@@ -25,9 +25,11 @@ public class LobbyListener implements Listener {
 
     private final Trolling trolling;
     private boolean isCountdown = false;
+    private final GameManager gameManager;
 
     public LobbyListener(final Trolling trolling) {
         this.trolling = trolling;
+        this.gameManager = trolling.getGameManager();
     }
 
     @EventHandler
@@ -87,8 +89,8 @@ public class LobbyListener implements Listener {
         if (world.getName().equalsIgnoreCase("ChallengesLobby_world")) {
             event.setCancelled(true);
 
-            if (GameManager.gameStatus == GameStatus.LOBBY) {
-                Bukkit.getServer().sendMessage(Component.text(player.getName() + " ist fucking ready", NamedTextColor.DARK_GREEN));
+            if (gameManager.getGameStatus() == GameStatus.LOBBY) {
+                Bukkit.getServer().sendMessage(Component.text(player.getName() + " is fucking ready", NamedTextColor.DARK_GREEN));
                 if (allPlayerPortal() && !isCountdown) {
                     countdown();
                 }
@@ -116,8 +118,8 @@ public class LobbyListener implements Listener {
             @Override
             public void run() {
                 if (start_counter <= 0) {
-                    trolling.getGameManager().startGame();
                     isCountdown = false;
+                    trolling.getGameManager().startGame();
                     cancel();
                     return;
                 }

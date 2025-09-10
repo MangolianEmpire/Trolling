@@ -14,8 +14,8 @@ public class GameManager {
     private final File statusFile;
     private final YamlConfiguration config;
 
-    public static GameStatus gameStatus = GameStatus.LOBBY;
-    public static GameMode gameMode = GameMode.CASUAL;
+    private GameStatus gameStatus = GameStatus.LOBBY;
+    private GameMode gameMode = GameMode.CASUAL;
 
     public GameManager(Trolling plugin) {
         this.plugin = plugin;
@@ -107,6 +107,14 @@ public class GameManager {
         } catch (IOException e) {
             plugin.getLogger().severe("Fehler beim Speichern von status.yml: " + e.getMessage());
         }
+    }
+
+    public GameMode getGameMode() {
+        return gameMode;
+    }
+
+    public GameStatus getGameStatus() {
+        return gameStatus;
     }
 }
 

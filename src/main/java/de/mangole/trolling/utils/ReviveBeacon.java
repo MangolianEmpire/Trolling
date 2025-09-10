@@ -1,11 +1,10 @@
 package de.mangole.trolling.utils;
 
 import de.mangole.trolling.Trolling;
-import de.mangole.trolling.events.GameFortniteListener;
+import de.mangole.trolling.gamemodes.GameModeFortnite;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
-import org.bukkit.block.Beacon;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
@@ -17,6 +16,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -29,6 +29,8 @@ public class ReviveBeacon implements Listener {
     private final int reviveDuration;
     private final Material oldBlock;
     private final Block block;
+    private final Block[] foundation;
+    private final Material[] foundationMats;
     private final BukkitTask reviveTask;
     private TextDisplay progressDisplay;
 
@@ -40,10 +42,22 @@ public class ReviveBeacon implements Listener {
         this.block = block;
 
         Bukkit.getPluginManager().registerEvents(this, trolling);
+
         oldBlock = block.getType();
         block.setType(Material.BEACON);
-        Beacon beacon = (Beacon) block.getState();
-        beacon.update();
+        foundation = new Block[9];
+        foundationMats = new Material[9];
+        int i = 0;
+        for (int x = block.getX() - 1; x <= block.getX() + 1; x++) {
+            for (int z = block.getZ() - 1; z <= block.getZ() + 1; z++) {
+                Block foundationBlock = block.getWorld().getBlockAt(x, block.getY() - 1, z);
+                foundation[i] = foundationBlock;
+                Material oldMat = foundationBlock.getType();
+                foundationMats[i] = oldMat;
+                foundationBlock.setType(Material.IRON_BLOCK);
+                i++;
+            }
+        }
 
         reviveTask = reviveTask();
     }
@@ -54,6 +68,7 @@ public class ReviveBeacon implements Listener {
         for (CustomChallenge challenge : trolling.getChallengeLoader().getCustomChallenges()) {
             if (challenge.getChallengeName().equals("FasterMinecraft") && challenge.isActive()) {
                 period = 5;
+                break;
             }
         }
 
@@ -96,7 +111,7 @@ public class ReviveBeacon implements Listener {
         World world = block.getWorld();
         Location location = block.getLocation();
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getWorld().equals(world) && !player.equals(revivePlayer) && !player.getGameMode().equals(GameMode.SPECTATOR)) {
+            if (player.getWorld().equals(world) && !player.equals(revivePlayer) && player.getGameMode().equals(GameMode.SURVIVAL)) {
                 if (player.getLocation().distance(location) < reviveRange) {
                     numberPlayers++;
                 }
@@ -130,16 +145,20 @@ public class ReviveBeacon implements Listener {
     }
 
     private void revivePlayer() {
-        revivePlayer.setSpectatorTarget(null);
         revivePlayer.teleport(block.getLocation());
+        revivePlayer.clearActivePotionEffects();
+        revivePlayer.getInventory().clear();
         revivePlayer.setGameMode(GameMode.SURVIVAL);
         World world = block.getWorld();
         world.playSound(block.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
+        Bukkit.getPluginManager().callEvent(new PlayerRespawnEvent(revivePlayer, block.getLocation(), false, false, false, PlayerRespawnEvent.RespawnReason.PLUGIN));
     }
 
     public void cleanup() {
-        revivePlayer();
         block.setType(oldBlock);
+        for (int i = 0; i < foundationMats.length; i++) {
+            foundation[i].setType(foundationMats[i]);
+        }
         progressDisplay.remove();
 
         HandlerList.unregisterAll(this);
@@ -148,7 +167,9 @@ public class ReviveBeacon implements Listener {
             reviveTask.cancel();
         }
 
-        GameFortniteListener.reviveBeacons.remove(this);
+        GameModeFortnite.reviveBeacons.remove(this);
+
+        revivePlayer();
     }
 
     public Player getRevivePlayer() {
@@ -163,20 +184,45 @@ public class ReviveBeacon implements Listener {
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
         if (event.getBlock().equals(block)) event.setCancelled(true);
+
+        for (Block value : foundation) {
+            if (event.getBlock().equals(value)) {
+                event.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler
     public void onExplode(BlockExplodeEvent event) {
         if (event.getBlock().equals(block)) event.setCancelled(true);
+
+        for (Block value : foundation) {
+            if (event.getBlock().equals(value)) {
+                event.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler
     public void onBurn(BlockBurnEvent event) {
         if (event.getBlock().equals(block)) event.setCancelled(true);
+
+        for (Block value : foundation) {
+            if (event.getBlock().equals(value)) {
+                event.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        if (event.getClickedBlock() != null && event.getClickedBlock().equals(block)) event.setCancelled(true);
+        if (event.getClickedBlock() == null) return;
+        if (event.getClickedBlock().equals(block)) event.setCancelled(true);
+
+        for (Block value : foundation) {
+            if (event.getClickedBlock().equals(value)) {
+                event.setCancelled(true);
+            }
+        }
     }
 }
