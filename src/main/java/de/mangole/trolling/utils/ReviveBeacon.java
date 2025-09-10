@@ -72,7 +72,7 @@ public class ReviveBeacon implements Listener {
             }
         }
 
-        Location loc = block.getLocation().clone().add(0.5, 1, 0.5);
+        Location loc = block.getLocation().clone().add(0.0, 1, 0.0);
         if (progressDisplay == null || progressDisplay.isDead()) {
             progressDisplay = block.getWorld().spawn(loc, TextDisplay.class, textDisplay -> {
                 textDisplay.setBillboard(Display.Billboard.VERTICAL);
