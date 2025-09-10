@@ -1,17 +1,16 @@
 package de.mangole.trolling.events;
 
-import de.mangole.trolling.*;
+import de.mangole.trolling.GameManager;
+import de.mangole.trolling.GameStatus;
+import de.mangole.trolling.Trolling;
 import de.mangole.trolling.utils.PlayerInitUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scoreboard.Scoreboard;
 
 public class GameChangeListener implements Listener {
 
@@ -32,10 +31,11 @@ public class GameChangeListener implements Listener {
 
         if (oldStatus == GameStatus.LOBBY && newStatus == GameStatus.RUNNING) {
             World gameOverWorld = Bukkit.getWorld("game_overworld");
-            Bukkit.getWorlds().forEach(world -> {world.setDifficulty(Difficulty.HARD);});
+            Bukkit.getWorlds().forEach(world -> {
+                world.setDifficulty(Difficulty.HARD);
+                world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);});
             Bukkit.getOnlinePlayers().forEach(PlayerInitUtils::initPlayerGame);
             gameOverWorld.setTime(1000);
-            gameOverWorld.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
         }
 
         if (newStatus == GameStatus.LOBBY) {
@@ -63,7 +63,7 @@ public class GameChangeListener implements Listener {
             Bukkit.getOnlinePlayers().forEach(player -> {
                 player.getInventory().clear();
                 player.setGameMode(GameMode.SPECTATOR);
-                player.playSound(player.getLocation(), Sound.ENTITY_CHICKEN_DEATH, 1F, 1F);
+                player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1F, 0.3F);
             });
             Bukkit.getServer().sendMessage(Component.text("You lost the Game. It will automatically stop in 60 seconds", NamedTextColor.GREEN));
 

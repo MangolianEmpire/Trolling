@@ -156,7 +156,6 @@ public class ReviveBeacon implements Listener {
 
     public void cleanup() {
         block.setType(oldBlock);
-        revivePlayer();
         for (int i = 0; i < foundationMats.length; i++) {
             foundation[i].setType(foundationMats[i]);
         }
@@ -168,8 +167,9 @@ public class ReviveBeacon implements Listener {
             reviveTask.cancel();
         }
 
-
         GameModeFortnite.reviveBeacons.remove(this);
+
+        revivePlayer();
     }
 
     public Player getRevivePlayer() {

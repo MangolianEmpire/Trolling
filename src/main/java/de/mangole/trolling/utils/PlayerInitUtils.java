@@ -5,7 +5,6 @@ import de.mangole.trolling.WorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.advancement.Advancement;
 import org.bukkit.entity.Player;
 
 public class PlayerInitUtils {
@@ -20,6 +19,9 @@ public class PlayerInitUtils {
         player.setHealth(20);
         player.setFoodLevel(20);
         player.setExperienceLevelAndProgress(0);
+        player.setInvisible(false);
+        player.setCollidable(true);
+        player.setAllowFlight(false);
         player.teleport(WorldManager.lobbySpawn);
         player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1F);
         player.clearActivePotionEffects();
@@ -34,5 +36,8 @@ public class PlayerInitUtils {
         player.setHealth(20);
         player.setFoodLevel(20);
         player.setExperienceLevelAndProgress(0);
+        player.setInvisible(false);
+        player.setCollidable(true);
+        player.setAllowFlight(false);
     }
 }

@@ -7,12 +7,17 @@ import de.mangole.trolling.utils.ReviveBeacon;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -62,23 +67,37 @@ public class GameModeFortnite extends GameModeBase {
             player.setGameMode(org.bukkit.GameMode.SPECTATOR);
         } else {
             fortniteSpectator.resetFortniteSpectator(player);
-            player.setGameMode(org.bukkit.GameMode.SURVIVAL);
         }
 
     }
 
     @GameModeEvent
     public void onSpectatorInteract(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
+        Player spectator = event.getPlayer();
         ItemStack clicked = event.getItem();
 
-        if (event.getHand() != EquipmentSlot.HAND) return;
+        if (fortniteSpectator.getSpectators().contains(spectator)) {
+            event.setCancelled(true);
+        }
 
         if (clicked != null && clicked.equals(fortniteSpectator.getSpectatingCompass())) {
-            event.setCancelled(true);
-            fortniteSpectator.getSpectatingInventory(player).open(player);
-        } else {
-            if (fortniteSpectator.getSpectators().contains(player)) {
+            fortniteSpectator.getSpectatingInventory(spectator).open(spectator);
+        }
+    }
+
+    @GameModeEvent
+    public void onSpectatorHit(EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof Player spectator) {
+            if (fortniteSpectator.getSpectators().contains(spectator)) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @GameModeEvent
+    public void onSpectatorArrowHit(ProjectileHitEvent event) {
+        if (event.getHitEntity() instanceof Player spectator) {
+            if (fortniteSpectator.getSpectators().contains(spectator)) {
                 event.setCancelled(true);
             }
         }
@@ -94,6 +113,43 @@ public class GameModeFortnite extends GameModeBase {
     }
 
     @GameModeEvent
+    public void onInventoryOpen(InventoryOpenEvent event) {
+        if (!(event.getInventory().getHolder() instanceof Player spectator)) return;
+        if (fortniteSpectator.getSpectators().contains(spectator)) {
+            if (event.getInventory().equals(fortniteSpectator.getSpectatingInventory(spectator))) return;
+
+            event.setCancelled(true);
+        }
+    }
+
+    @GameModeEvent
+    public void onItemDrop(PlayerDropItemEvent event) {
+        Player spectator = event.getPlayer();
+        if (fortniteSpectator.getSpectators().contains(spectator)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @GameModeEvent
+    public void onItemPickup(EntityPickupItemEvent event) {
+        if (!(event.getEntity() instanceof Player spectator)) return;
+        if (fortniteSpectator.getSpectators().contains(spectator)) {
+            event.setCancelled(true);
+            event.getItem().setPickupDelay(Integer.MAX_VALUE);
+        }
+    }
+
+    @GameModeEvent
+    public void onInventoryCreative(InventoryCreativeEvent event) {
+        if (!(event.getWhoClicked() instanceof Player spectator)) return;
+
+        if (fortniteSpectator.getSpectators().contains(spectator)) {
+            event.setCancelled(true);
+        }
+    }
+
+
+    @GameModeEvent
     public void onSpectatorMoveOutOfDistance(PlayerMoveEvent event) {
         Player spectator = event.getPlayer();
         if (!fortniteSpectator.getSpectators().contains(spectator)) return;
@@ -105,11 +161,11 @@ public class GameModeFortnite extends GameModeBase {
             ReviveBeacon beacon = getReviveBeacon(spectator);
             assert beacon != null;
             Location beaconLocation = beacon.getReviveLocation();
-            if (to.distance(beaconLocation) > 100) {
+            if (to.distance(beaconLocation) > 50) {
                 spectator.teleport(beaconLocation);
             }
         } else {
-            if (to.distance(target.getLocation()) > 100) {
+            if (!target.getWorld().equals(to.getWorld()) || to.distance(target.getLocation()) > 50) {
                 spectator.teleport(target);
             }
         }
@@ -122,10 +178,10 @@ public class GameModeFortnite extends GameModeBase {
 
         Map<Player, Player> spectatorTargets = fortniteSpectator.getSpectatorTargets();
 
-        if (fortniteSpectator.getSpectatorTargets().containsValue(target)) {
+        if (spectatorTargets.containsValue(target)) {
             spectatorTargets.forEach((spectator, target2) -> {
-                if (!target.equals(target2)) {
-                    if (spectator.getLocation().distance(target2.getLocation()) > 100) {
+                if (target.equals(target2)) {
+                    if (!spectator.getWorld().equals(target.getWorld()) || spectator.getLocation().distance(target2.getLocation()) > 50) {
                         spectator.teleport(target2);
                     }
                 }

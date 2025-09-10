@@ -64,7 +64,7 @@ public class GameLogicListener implements Listener {
     }
 
     @EventHandler
-    public void onPauseSpawn(PlayerMoveEvent event) {
+    public void onPauseMove(PlayerMoveEvent event) {
         if (gameManager.getGameStatus() == GameStatus.PAUSED) {
             event.setCancelled(true);
         }
