@@ -18,6 +18,14 @@ import java.util.Random;
 
 public class WorldReset implements CommandExecutor {
 
+    private final Trolling trolling;
+    private final GameManager gameManager;
+
+    public WorldReset(Trolling trolling) {
+        this.trolling = trolling;
+        this.gameManager = trolling.getGameManager();
+    }
+
     private final String[] customWorlds = {"game_overworld", "game_nether", "game_end"};
 
     @Override
@@ -30,7 +38,7 @@ public class WorldReset implements CommandExecutor {
             return false;
         }
 
-        if (GameManager.gameStatus != GameStatus.LOBBY) {
+        if (gameManager.getGameStatus() != GameStatus.LOBBY) {
             sender.sendMessage("Not possible while the Game is running");
             return false;
         }
@@ -74,7 +82,7 @@ public class WorldReset implements CommandExecutor {
         }
 
         // neue Welt mit Seed generieren
-        Bukkit.getScheduler().runTaskLater(Trolling.plugin, () -> {
+        Bukkit.getScheduler().runTaskLater(trolling, () -> {
             WorldCreator wc = new WorldCreator(worldName).seed(seed);
 
             // Nether / End explizit setzen

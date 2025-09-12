@@ -3,23 +3,22 @@ package de.mangole.trolling;
 import de.mangole.trolling.events.GameChangeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
 
 public class GameManager {
 
-    private final Trolling plugin;
+    private final Trolling trolling;
     private final File statusFile;
     private final YamlConfiguration config;
 
-    public static GameStatus gameStatus = GameStatus.LOBBY;
-    public static GameMode gameMode = GameMode.CASUAL;
+    private GameStatus gameStatus = GameStatus.LOBBY;
+    private GameMode gameMode = GameMode.CASUAL;
 
-    public GameManager(Trolling plugin) {
-        this.plugin = plugin;
-        this.statusFile = new File(plugin.getDataFolder(), "status.yml");
+    public GameManager(Trolling trolling) {
+        this.trolling = trolling;
+        this.statusFile = new File(trolling.getDataFolder(), "status.yml");
         this.config = YamlConfiguration.loadConfiguration(statusFile);
         loadStatus();
     }
@@ -28,7 +27,7 @@ public class GameManager {
         if (gameStatus == GameStatus.LOBBY) {
             Bukkit.getPluginManager().callEvent(new GameChangeEvent(gameMode, gameMode, gameStatus, GameStatus.RUNNING));
             gameStatus = GameStatus.RUNNING;
-            plugin.getTimer().start();
+            trolling.getTimerManager().startTimer();
         }
     }
 
@@ -36,7 +35,7 @@ public class GameManager {
         if (gameStatus == GameStatus.RUNNING) {
             Bukkit.getPluginManager().callEvent(new GameChangeEvent(gameMode, gameMode, gameStatus, GameStatus.PAUSED));
             gameStatus = GameStatus.PAUSED;
-            plugin.getTimer().pause();
+            trolling.getTimerManager().pauseTimer();
         }
     }
 
@@ -44,7 +43,7 @@ public class GameManager {
         if (gameStatus == GameStatus.PAUSED) {
             Bukkit.getPluginManager().callEvent(new GameChangeEvent(gameMode, gameMode, gameStatus, GameStatus.RUNNING));
             gameStatus = GameStatus.RUNNING;
-            plugin.getTimer().resume();
+            trolling.getTimerManager().resumeTimer();
         }
     }
 
@@ -52,7 +51,7 @@ public class GameManager {
         if (gameStatus != GameStatus.LOBBY) {
             Bukkit.getPluginManager().callEvent(new GameChangeEvent(gameMode, gameMode, gameStatus, GameStatus.LOST));
             gameStatus = GameStatus.LOST;
-            plugin.getTimer().pause();
+            trolling.getTimerManager().pauseTimer();
         }
     }
 
@@ -60,7 +59,7 @@ public class GameManager {
         if (gameStatus != GameStatus.LOBBY) {
             Bukkit.getPluginManager().callEvent(new GameChangeEvent(gameMode, gameMode, gameStatus, GameStatus.LOBBY));
             gameStatus = GameStatus.LOBBY;
-            plugin.getTimer().stop();
+            trolling.getTimerManager().stopTimer();
         }
     }
 
@@ -87,7 +86,7 @@ public class GameManager {
                 gameStatus = GameStatus.valueOf(status);
                 gameMode = GameMode.valueOf(mode);
             } catch (IllegalArgumentException e) {
-                plugin.getLogger().warning("Ungültiger Status in Datei, fallback auf LOBBY.");
+                trolling.getLogger().warning("Ungültiger Status in Datei, fallback auf LOBBY.");
                 gameStatus = GameStatus.LOBBY;
                 gameMode = GameMode.CASUAL;
             }
@@ -95,7 +94,7 @@ public class GameManager {
             gameStatus = GameStatus.LOBBY;
             gameMode = GameMode.CASUAL;
         }
-        plugin.getLogger().info("Spielstatus geladen: " + gameStatus + " " + gameMode);
+        trolling.getLogger().info("Spielstatus geladen: " + gameStatus + " " + gameMode);
     }
 
     public void saveStatus() {
@@ -103,10 +102,18 @@ public class GameManager {
         config.set("gameMode", gameMode.toString());
         try {
             config.save(statusFile);
-            plugin.getLogger().info("Spielstatus gespeichert: " + gameStatus + " " + gameMode);
+            trolling.getLogger().info("Spielstatus gespeichert: " + gameStatus + " " + gameMode);
         } catch (IOException e) {
-            plugin.getLogger().severe("Fehler beim Speichern von status.yml: " + e.getMessage());
+            trolling.getLogger().severe("Fehler beim Speichern von status.yml: " + e.getMessage());
         }
+    }
+
+    public GameMode getGameMode() {
+        return gameMode;
+    }
+
+    public GameStatus getGameStatus() {
+        return gameStatus;
     }
 }
 

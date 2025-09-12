@@ -34,7 +34,6 @@ public class TimeCounter {
 
     public void start() {
         paused = false;
-        seconds = 0;
         long period = 20;
         for (CustomChallenge challenge : trolling.getChallengeLoader().getCustomChallenges()) {
             if (challenge.getChallengeName().equals("FasterMinecraft") && challenge.isActive()) {
@@ -45,6 +44,8 @@ public class TimeCounter {
         if (counter != null) {
             counter.cancel();
         }
+
+        updateScoreboard(seconds);
 
         counter = new BukkitRunnable() {
             @Override
@@ -94,6 +95,14 @@ public class TimeCounter {
 
     public void addPlayer(Player player) {
         player.setScoreboard(scoreboard);
+    }
+
+    public long getSeconds() {
+        return seconds;
+    }
+
+    public void setSeconds (long seconds) {
+        this.seconds = seconds;
     }
 }
 

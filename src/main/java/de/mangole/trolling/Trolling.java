@@ -20,7 +20,7 @@ public class Trolling extends JavaPlugin {
     private Data data;
     private WorldManager worldManager;
     private ChallengeLoader challengeLoader;
-    private TimeCounter timer;
+    private TimerManager timerManager;
     private ProtocolManager protocolManager;
     public static Plugin plugin;
 
@@ -36,12 +36,18 @@ public class Trolling extends JavaPlugin {
         this.gameManager = new GameManager(this);
         this.challengeLoader = new ChallengeLoader(this);
         this.data = new Data(this);
-        this.timer = new TimeCounter(this);
+        this.timerManager = new TimerManager(this);
         this.protocolManager = ProtocolLibrary.getProtocolManager();
 
         registerEvents();
         registerCommands();
         plugin = this;
+
+        if (gameManager.getGameStatus() == GameStatus.LOST) {
+            gameManager.stopGame();
+        } else if (gameManager.getGameStatus() != GameStatus.LOBBY) {
+            gameManager.pauseGame();
+        }
     }
 
     @Override
@@ -53,6 +59,10 @@ public class Trolling extends JavaPlugin {
         if (this.challengeLoader != null) {
             challengeLoader.saveChallenges();
         }
+
+        if (this.timerManager != null) {
+            timerManager.saveTimer();
+        }
     }
 
     private void registerEvents() {
@@ -62,12 +72,11 @@ public class Trolling extends JavaPlugin {
         pluginManager.registerEvents(new GamePortalListener(this), this);
         pluginManager.registerEvents(new GameChangeListener(this), this);
         pluginManager.registerEvents(new GameLogicListener(this), this);
-        pluginManager.registerEvents(new GameFortniteListener(this), this);
     }
 
     private void registerCommands() {
-        getCommand("world").setExecutor(new WorldCommand());
-        getCommand("worldreset").setExecutor(new WorldReset());
+        getCommand("world").setExecutor(new WorldCommand(this));
+        getCommand("worldreset").setExecutor(new WorldReset(this));
         getCommand("gamechange").setExecutor(new GameChange(this));
         getCommand("challengeedit").setExecutor(new ChallengeEdit(this));
     }
@@ -84,8 +93,8 @@ public class Trolling extends JavaPlugin {
         return gameManager;
     }
 
-    public TimeCounter getTimer() {
-        return this.timer;
+    public TimerManager getTimerManager() {
+        return this.timerManager;
     }
 
     public ProtocolManager getProtocolManager() {

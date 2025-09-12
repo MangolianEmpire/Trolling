@@ -33,11 +33,14 @@ public class WorldManager {
         WorldCreator wc3 = new WorldCreator("game_end").environment(World.Environment.THE_END);
         Bukkit.createWorld(wc3);
 
+        for (World w : Bukkit.getWorlds()) {
+            w.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+        }
     }
 
     private void loadLocations() {
-        lobbySpawn = new Location(lobbyWorld, 0.5, 31 ,-17.5, 0, 0);
-        portalLobbySpawn = new Location(lobbyWorld, 0.5, 70 ,16.5, 0, 0);
+        lobbySpawn = new Location(lobbyWorld, 0.5, 31, -17.5, 0, 0);
+        portalLobbySpawn = new Location(lobbyWorld, 0.5, 70, 16.5, 0, 0);
         lobbyWorld.setSpawnLocation(lobbySpawn);
         lobbyWorld.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
     }

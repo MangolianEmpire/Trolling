@@ -15,9 +15,11 @@ import org.bukkit.entity.Player;
 public class GameChange implements CommandExecutor {
 
     private final Trolling trolling;
+    private final GameManager gameManager;
 
     public GameChange(Trolling trolling) {
         this.trolling = trolling;
+        this.gameManager = trolling.getGameManager();
     }
 
     @Override
@@ -28,10 +30,6 @@ public class GameChange implements CommandExecutor {
         }
 
         String status = args[0];
-
-        GameStatus oldStatus = GameManager.gameStatus;
-        GameMode oldMode = GameManager.gameMode;
-        GameManager gameManager = trolling.getGameManager();
 
         if (status.equals("start")) {
             gameManager.startGame();
