@@ -32,10 +32,45 @@ public class ChallengeLoader {
 
 
     private void loadChallenges() {
-        // FallDamage
+
+        //Create all Challeges
         FallChallenge fallChallenge = new FallChallenge(trolling);
         challenges.add(fallChallenge);
 
+        TheCrazyMobs theCrazyMobs = new TheCrazyMobs(trolling);
+        challenges.add(theCrazyMobs);
+
+        FasterMincraft fasterMincraft = new FasterMincraft(trolling);
+        challenges.add(fasterMincraft);
+
+        WeirdChests weirdChests = new WeirdChests(trolling);
+        challenges.add(weirdChests);
+
+        Communism communism = new Communism(trolling);
+        challenges.add(communism);
+
+        Hardcore hardcore = new Hardcore(trolling);
+        challenges.add(hardcore);
+
+        Shortsightedness shortsightedness = new Shortsightedness(trolling);
+        challenges.add(shortsightedness);
+
+        FloodedWorld floodedWorld = new FloodedWorld(trolling);
+        challenges.add(floodedWorld);
+
+        MrPh8terHater mrPh8terHater = new MrPh8terHater(trolling);
+        mrPh8terHater.activate();
+        challenges.add(mrPh8terHater);
+
+
+        // active saved challenges
+        for (CustomChallenge challenge : challenges) {
+            boolean active = config.getBoolean("challenges." + challenge.getChallengeName(), false);
+            if (active) challenge.activate();
+        }
+
+
+        // FallDamage
         customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
                 Material.FEATHER,
                 Component.text("No Falldamage", NamedTextColor.WHITE),
@@ -44,9 +79,6 @@ public class ChallengeLoader {
         ));
 
         // TheCrazyMobs
-        TheCrazyMobs theCrazyMobs = new TheCrazyMobs(trolling);
-        challenges.add(theCrazyMobs);
-
         customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
                 Material.SKELETON_SKULL,
                 Component.text("TheCrazyMobs", NamedTextColor.DARK_GREEN),
@@ -55,9 +87,6 @@ public class ChallengeLoader {
         ));
 
         // Faster Minecraft
-        FasterMincraft fasterMincraft = new FasterMincraft(trolling);
-        challenges.add(fasterMincraft);
-
         customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
                 Material.CLOCK,
                 Component.text("Minecraft on Speed", NamedTextColor.AQUA),
@@ -66,9 +95,6 @@ public class ChallengeLoader {
         ));
 
         // WeirdChests
-        WeirdChests weirdChests = new WeirdChests(trolling);
-        challenges.add(weirdChests);
-
         customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
                 Material.CHEST,
                 Component.text("WeirdChests", NamedTextColor.DARK_PURPLE),
@@ -77,9 +103,6 @@ public class ChallengeLoader {
         ));
 
         // Communism
-        Communism communism = new Communism(trolling);
-        challenges.add(communism);
-
         customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
                 Material.GOLDEN_PICKAXE,
                 Component.text("Communism", NamedTextColor.DARK_RED),
@@ -88,9 +111,6 @@ public class ChallengeLoader {
         ));
 
         // Hardcore
-        Hardcore hardcore = new Hardcore(trolling);
-        challenges.add(hardcore);
-
         customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
                 Material.GOLDEN_APPLE,
                 Component.text("Hardcore", NamedTextColor.LIGHT_PURPLE),
@@ -98,9 +118,7 @@ public class ChallengeLoader {
                 hardcore
         ));
 
-        Shortsightedness shortsightedness = new Shortsightedness(trolling);
-        challenges.add(shortsightedness);
-
+        // Shortsightedness
         customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
                 Material.SPYGLASS,
                 Component.text("Chris' normal vision", NamedTextColor.BLACK),
@@ -109,26 +127,12 @@ public class ChallengeLoader {
         ));
 
         // FloodedWorld
-        FloodedWorld floodedWorld = new FloodedWorld(trolling);
-        challenges.add(floodedWorld);
-
         customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
                 Material.TROPICAL_FISH_BUCKET,
                 Component.text("Atlantis", NamedTextColor.BLUE),
                 Component.text("Climate Change kicks your balls", NamedTextColor.BLUE),
                 floodedWorld
         ));
-
-        // MrPh8terHater
-        MrPh8terHater mrPh8terHater = new MrPh8terHater(trolling);
-        mrPh8terHater.activate();
-        challenges.add(mrPh8terHater);
-
-        // active saved challenges
-        for (CustomChallenge challenge : challenges) {
-            boolean active = config.getBoolean("challenges." + challenge.getChallengeName(), false);
-            if (active) challenge.activate();
-        }
     }
 
     public void saveChallenges() {

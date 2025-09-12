@@ -3,19 +3,13 @@ package de.mangole.trolling;
 import de.mangole.trolling.challenges.ChallengeLoader;
 import de.mangole.trolling.utils.CustomChallengeItem;
 import de.mangole.trolling.utils.CustomInventory;
-import de.mangole.trolling.utils.ReviveBeacon;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
-import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Data {
@@ -58,7 +52,7 @@ public class Data {
         lobbyGameModeChanger = gameModeChanger;
     }
 
-    private void loadCustomInventories() {
+    public void loadCustomInventories() {
         lobbySettingsInventory = new CustomInventory(plugin, 4, Component.text("Settings"));
         int i = 0;
         for (CustomChallengeItem item : ChallengeLoader.customChallengeItems) {
