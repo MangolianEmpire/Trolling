@@ -47,7 +47,7 @@ public class GameLogicListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        trolling.getTimer().addPlayer(player);
+        trolling.getTimerManager().getTimerCounter().addPlayer(player);
         if (gameManager.getGameStatus() == GameStatus.LOBBY) {
             PlayerInitUtils.initPlayerLobby(player);
         } else if (player.getLocation().getWorld().equals(WorldManager.lobbyWorld)) {

@@ -82,7 +82,7 @@ public class WorldReset implements CommandExecutor {
         }
 
         // neue Welt mit Seed generieren
-        Bukkit.getScheduler().runTaskLater(Trolling.plugin, () -> {
+        Bukkit.getScheduler().runTaskLater(trolling, () -> {
             WorldCreator wc = new WorldCreator(worldName).seed(seed);
 
             // Nether / End explizit setzen

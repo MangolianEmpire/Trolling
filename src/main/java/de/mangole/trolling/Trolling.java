@@ -20,7 +20,7 @@ public class Trolling extends JavaPlugin {
     private Data data;
     private WorldManager worldManager;
     private ChallengeLoader challengeLoader;
-    private TimeCounter timer;
+    private TimerManager timerManager;
     private ProtocolManager protocolManager;
     public static Plugin plugin;
 
@@ -36,12 +36,18 @@ public class Trolling extends JavaPlugin {
         this.gameManager = new GameManager(this);
         this.challengeLoader = new ChallengeLoader(this);
         this.data = new Data(this);
-        this.timer = new TimeCounter(this);
+        this.timerManager = new TimerManager(this);
         this.protocolManager = ProtocolLibrary.getProtocolManager();
 
         registerEvents();
         registerCommands();
         plugin = this;
+
+        if (gameManager.getGameStatus() == GameStatus.LOST) {
+            gameManager.stopGame();
+        } else if (gameManager.getGameStatus() != GameStatus.LOBBY) {
+            gameManager.pauseGame();
+        }
     }
 
     @Override
@@ -52,6 +58,10 @@ public class Trolling extends JavaPlugin {
         }
         if (this.challengeLoader != null) {
             challengeLoader.saveChallenges();
+        }
+
+        if (this.timerManager != null) {
+            timerManager.saveTimer();
         }
     }
 
@@ -83,8 +93,8 @@ public class Trolling extends JavaPlugin {
         return gameManager;
     }
 
-    public TimeCounter getTimer() {
-        return this.timer;
+    public TimerManager getTimerManager() {
+        return this.timerManager;
     }
 
     public ProtocolManager getProtocolManager() {
