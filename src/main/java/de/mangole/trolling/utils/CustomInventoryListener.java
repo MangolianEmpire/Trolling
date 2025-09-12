@@ -1,12 +1,8 @@
 package de.mangole.trolling.utils;
 
 import de.mangole.trolling.Data;
-import de.mangole.trolling.GameManager;
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.WorldManager;
-import de.mangole.trolling.gamemodes.FortniteSpectator;
-import de.mangole.trolling.gamemodes.GameModeFortnite;
-import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -70,6 +66,7 @@ public class CustomInventoryListener implements Listener {
 
         if (clicked != null && clicked.isSimilar(Data.lobbySettings)) {
             if (world.getName().equals("ChallengesLobby_world")) {
+                trolling.getData().loadCustomInventories();
                 Data.lobbySettingsInventory.open(player);
             }
             return true;
