@@ -7,10 +7,12 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementProgress;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 public class PlayerInitUtils {
 
@@ -21,7 +23,7 @@ public class PlayerInitUtils {
         player.getInventory().setItem(0, Data.lobbySpawnTeleporter);
         player.getInventory().setItem(4, Data.lobbySettings);
         player.getInventory().setItem(8, Data.lobbyGameModeChanger);
-        player.setHealth(20);
+        player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.MAX_HEALTH)).getBaseValue());
         player.setFoodLevel(20);
         player.setExperienceLevelAndProgress(0);
         player.setInvisible(false);
@@ -44,7 +46,7 @@ public class PlayerInitUtils {
         player.getInventory().clear();
         player.teleport(gameOverWorld.getSpawnLocation());
         player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1F);
-        player.setHealth(20);
+        player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.MAX_HEALTH)).getBaseValue());
         player.setFoodLevel(20);
         player.setExperienceLevelAndProgress(0);
         player.setInvisible(false);

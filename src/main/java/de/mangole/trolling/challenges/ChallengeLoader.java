@@ -62,6 +62,9 @@ public class ChallengeLoader {
         ChorusInfection chorusInfection = new ChorusInfection(trolling);
         challenges.add(chorusInfection);
 
+        Heartbroken heartbroken = new Heartbroken(trolling);
+        challenges.add(heartbroken);
+
         MrPh8terHater mrPh8terHater = new MrPh8terHater(trolling);
         mrPh8terHater.activate();
         challenges.add(mrPh8terHater);
@@ -142,6 +145,14 @@ public class ChallengeLoader {
                 Component.text("Chorus Infection", NamedTextColor.DARK_PURPLE),
                 Component.text("Why does the food taste like that?", NamedTextColor.DARK_PURPLE),
                 chorusInfection
+        ));
+
+        // Heartbroken
+        customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
+                Material.GHAST_TEAR,
+                Component.text("Heartbroken", NamedTextColor.RED),
+                Component.text("Why did she leave me :(", NamedTextColor.RED),
+                heartbroken
         ));
     }
 

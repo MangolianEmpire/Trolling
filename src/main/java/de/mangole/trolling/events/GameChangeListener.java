@@ -33,7 +33,8 @@ public class GameChangeListener implements Listener {
             World gameOverWorld = Bukkit.getWorld("game_overworld");
             Bukkit.getWorlds().forEach(world -> {
                 world.setDifficulty(Difficulty.HARD);
-                world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);});
+                world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+                world.setClearWeatherDuration(20 * 60 * 5);});
             Bukkit.getOnlinePlayers().forEach(PlayerInitUtils::initPlayerGame);
             gameOverWorld.setTime(1000);
         }
