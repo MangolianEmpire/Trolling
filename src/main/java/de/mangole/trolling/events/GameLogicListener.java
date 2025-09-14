@@ -51,7 +51,11 @@ public class GameLogicListener implements Listener {
         if (gameManager.getGameStatus() == GameStatus.LOBBY) {
             PlayerInitUtils.initPlayerLobby(player);
         } else if (player.getLocation().getWorld().equals(WorldManager.lobbyWorld)) {
-            PlayerInitUtils.initPlayerGame(player);
+            if (gameManager.getGameMode() == GameMode.FORTNITE) {
+                PlayerInitUtils.initPlayerFortnite(player);
+            } else {
+                PlayerInitUtils.initPlayerGame(player);
+            }
         }
 
         if (gameManager.getGameStatus() == GameStatus.LOST) {

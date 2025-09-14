@@ -35,7 +35,13 @@ public class GameChangeListener implements Listener {
                 world.setDifficulty(Difficulty.HARD);
                 world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
                 world.setClearWeatherDuration(20 * 60 * 5);});
-            Bukkit.getOnlinePlayers().forEach(PlayerInitUtils::initPlayerGame);
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (gameManager.getGameMode() == de.mangole.trolling.GameMode.FORTNITE) {
+                    PlayerInitUtils.initPlayerFortnite(player);
+                } else {
+                    PlayerInitUtils.initPlayerGame(player);
+                }
+            }
             gameOverWorld.setTime(1000);
         }
 
