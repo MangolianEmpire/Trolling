@@ -8,6 +8,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,17 +59,18 @@ public class ChallengeLoader {
         FloodedWorld floodedWorld = new FloodedWorld(trolling);
         challenges.add(floodedWorld);
 
+        ChorusInfection chorusInfection = new ChorusInfection(trolling);
+        challenges.add(chorusInfection);
+
         MrPh8terHater mrPh8terHater = new MrPh8terHater(trolling);
         mrPh8terHater.activate();
         challenges.add(mrPh8terHater);
-
 
         // active saved challenges
         for (CustomChallenge challenge : challenges) {
             boolean active = config.getBoolean("challenges." + challenge.getChallengeName(), false);
             if (active) challenge.activate();
         }
-
 
         // FallDamage
         customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
@@ -132,6 +134,14 @@ public class ChallengeLoader {
                 Component.text("Atlantis", NamedTextColor.BLUE),
                 Component.text("Climate Change kicks your balls", NamedTextColor.BLUE),
                 floodedWorld
+        ));
+
+        // ChorusInfection
+        customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
+                Material.CHORUS_FRUIT,
+                Component.text("Chorus Infection", NamedTextColor.DARK_PURPLE),
+                Component.text("Why does the food taste like that?", NamedTextColor.DARK_PURPLE),
+                chorusInfection
         ));
     }
 

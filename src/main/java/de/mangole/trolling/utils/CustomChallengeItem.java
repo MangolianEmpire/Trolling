@@ -1,5 +1,6 @@
 package de.mangole.trolling.utils;
 
+import de.mangole.trolling.Data;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.inventory.ItemStack;
