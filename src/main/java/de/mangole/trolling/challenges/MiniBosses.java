@@ -13,13 +13,14 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.SlimeSplitEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.util.Vector;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -52,7 +53,7 @@ public class MiniBosses extends CustomChallenge {
         Random random = new Random();
 
         // Mother Slime
-        if (mob instanceof Slime && random.nextDouble() <= 0.05) {
+        if (mob instanceof Slime && random.nextDouble() <= 0.08) {
             event.setCancelled(true);
             isSpawningBoss = true;
             spawnSlimeBoss(mob.getLocation());
@@ -87,6 +88,7 @@ public class MiniBosses extends CustomChallenge {
         miniSlime.customName(Component.text("§aBaby Slime"));
         miniSlime.setMetadata("isMinion", new FixedMetadataValue(trolling, true));
         miniSlime.setCustomNameVisible(true);
+        miniSlime.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, Integer.MAX_VALUE, 3));
     }
 
     @EventHandler
@@ -107,7 +109,7 @@ public class MiniBosses extends CustomChallenge {
             NamespacedKey key = new NamespacedKey(trolling, "slime_boots");
             meta.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
             meta.displayName(Component.text("Slime Boots", NamedTextColor.GREEN));
-            meta.lore(Collections.singletonList(Component.text("Chrouch in the air for a double jump!")));
+            meta.lore(Collections.singletonList(Component.text("Jump while crouching for a boost!")));
             meta.setColor(Color.GREEN);
             boots.setItemMeta(meta);
             event.getDrops().add(boots);
@@ -115,12 +117,8 @@ public class MiniBosses extends CustomChallenge {
     }
 
     @EventHandler
-    public void onPlayerJumpWhileSneaking(PlayerMoveEvent event) {
+    public void onPlayerJumpWhileSneaking(PlayerToggleSneakEvent event) {
         var player = event.getPlayer();
-
-        // Check if sneaking
-        if (!player.isSneaking()) return;
-        if (player.isOnGround()) return;
 
         // Must wear leather boots
         ItemStack boots = player.getInventory().getBoots();
@@ -133,21 +131,12 @@ public class MiniBosses extends CustomChallenge {
         NamespacedKey key = new NamespacedKey(trolling, "slime_boots");
         if (!meta.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) return;
 
-        // Check cooldown to prevent spam
-        if (player.hasMetadata("slime_jump_cooldown")) return;
-
-        // Apply velocity (boost upwards and maybe forward)
-        Vector velocity = player.getVelocity();
-        velocity.setY(0.5); // Jump height (tweak as needed)
-        player.setVelocity(velocity);
-
-        // Optional: play sound or particle
-        player.getWorld().playSound(player.getLocation(), "entity.slime.jump", 1f, 1f);
-        player.getWorld().spawnParticle(Particle.ITEM_SLIME, player.getLocation(), 10);
-
-        // Optional: small cooldown (e.g. 1 second)
-        player.setMetadata("slime_jump_cooldown", new FixedMetadataValue(trolling, true));
-        Bukkit.getScheduler().runTaskLater(trolling, () ->
-                player.removeMetadata("slime_jump_cooldown", trolling), 30);
+        if (!player.isSneaking()) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, Integer.MAX_VALUE, 4));
+            player.getWorld().playSound(player.getLocation(), "entity.slime.jump", 1f, 1f);
+            player.getWorld().spawnParticle(Particle.ITEM_SLIME, player.getLocation(), 10);
+        } else {
+            player.removePotionEffect(PotionEffectType.JUMP_BOOST);
+        }
     }
 }
