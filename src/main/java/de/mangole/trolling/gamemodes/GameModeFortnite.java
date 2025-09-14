@@ -6,18 +6,14 @@ import de.mangole.trolling.Trolling;
 import de.mangole.trolling.utils.ReviveBeacon;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -27,12 +23,15 @@ import java.util.Map;
 public class GameModeFortnite extends GameModeBase {
 
     public static ArrayList<ReviveBeacon> reviveBeacons = new ArrayList<>();
+    public static ArrayList<Player> fortniteSpawnPlayers = new ArrayList<>();
     private final FortniteSpectator fortniteSpectator;
 
     public GameModeFortnite(Trolling trolling) {
         super(trolling, GameMode.FORTNITE);
         this.fortniteSpectator = new FortniteSpectator(trolling);
     }
+
+    // Revive Logic
 
     @GameModeEvent
     public void onDeath(PlayerDeathEvent event) {
@@ -70,6 +69,8 @@ public class GameModeFortnite extends GameModeBase {
         }
 
     }
+
+    // Spectator Logic
 
     @GameModeEvent
     public void onSpectatorInteract(PlayerInteractEvent event) {
@@ -140,6 +141,15 @@ public class GameModeFortnite extends GameModeBase {
     }
 
     @GameModeEvent
+    public void onArrowPickup(PlayerPickupArrowEvent event) {
+        Player spectator = event.getPlayer();
+        if (fortniteSpectator.getSpectators().contains(spectator)) {
+            event.setCancelled(true);
+            event.getItem().setPickupDelay(Integer.MAX_VALUE);
+        }
+    }
+
+    @GameModeEvent
     public void onInventoryCreative(InventoryCreativeEvent event) {
         if (!(event.getWhoClicked() instanceof Player spectator)) return;
 
@@ -189,6 +199,32 @@ public class GameModeFortnite extends GameModeBase {
         }
     }
 
+    // Skyspawn Logic
+
+    @GameModeEvent
+    public void onPlayerToggleGlide(EntityToggleGlideEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (!fortniteSpawnPlayers.contains(player)) return;
+        if (event.isGliding() && !isOnGround(player)) event.setCancelled(true);
+    }
+
+    @GameModeEvent
+    public void onSpawnLand(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        if (!fortniteSpawnPlayers.contains(player)) return;
+
+        if (event.hasChangedBlock() && isOnGround(player)) {
+            if (player.getInventory().getChestplate() != null &&
+                    player.getInventory().getChestplate().getType() == Material.ELYTRA) {
+
+                player.getInventory().setChestplate(null);
+                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
+                fortniteSpawnPlayers.remove(player);
+                player.setGliding(false);
+            }
+        }
+    }
+
 
     private boolean hasReviveBeacon(Player player) {
         for (ReviveBeacon reviveBeacon : reviveBeacons) {
@@ -207,4 +243,11 @@ public class GameModeFortnite extends GameModeBase {
         }
         return null;
     }
+
+    private boolean isOnGround(Player player) {
+        Location loc = player.getLocation();
+        Location below = loc.clone().subtract(0, 0.1, 0);
+        return below.getBlock().getType().isSolid();
+    }
+
 }
