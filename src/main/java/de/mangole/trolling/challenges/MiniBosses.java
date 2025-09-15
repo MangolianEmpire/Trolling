@@ -69,6 +69,13 @@ public class MiniBosses extends CustomChallenge {
             spawnBlazeBoss(mob.getLocation());
             isSpawningBoss = false;
         }
+
+//        if (mob instanceof Skeleton) {
+//            event.setCancelled(true);
+//            isSpawningBoss = true;
+//            spawnNecromancer(mob.getLocation());
+//            isSpawningBoss = false;
+//        }
     }
 
 
@@ -84,6 +91,7 @@ public class MiniBosses extends CustomChallenge {
         bossSlime.setPersistent(true);
         bossSlime.setAI(true);
     }
+
     @EventHandler
     public void onBossSlimeHit(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Slime slime)) return;
@@ -150,7 +158,6 @@ public class MiniBosses extends CustomChallenge {
             player.removePotionEffect(PotionEffectType.JUMP_BOOST);
         }
     }
-
 
 
     // Ashen Tyrant __________________________________________________________________________________________________
@@ -285,4 +292,51 @@ public class MiniBosses extends CustomChallenge {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 1.2f);
     }
 
+
+    // Dark Necromancer
+
+//    public void spawnNecromancer(@NotNull Location loc) {
+//        WitherSkeleton necromancer = (WitherSkeleton) loc.getWorld().spawnEntity(loc, EntityType.WITHER_SKELETON);
+//
+//        necromancer.customName(Component.text("Ashen Tyrant", NamedTextColor.GRAY));
+//        necromancer.setCustomNameVisible(true);
+//        necromancer.getEquipment().setItemInMainHand(new ItemStack(Material.ENCHANTED_BOOK));
+//        necromancer.getEquipment().setItemInMainHandDropChance(0f); // Don't drop book
+//        necromancer.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET)); // Optional cosmetic
+//        necromancer.setMetadata("isBoss", new FixedMetadataValue(trolling, true));
+//        necromancer.setShouldBurnInDay(false); // Sunlight immunity
+//        Objects.requireNonNull(necromancer.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(60);
+//        necromancer.setHealth(60);
+//
+//        startNecromancing(necromancer);
+//    }
+//
+//    private void startNecromancing(WitherSkeleton necromancer) {
+//        new BukkitRunnable() {
+//
+//            @Override
+//            public void run () {
+//                for (World world : Bukkit.getWorlds()) {
+//                    for (Entity entity : world.getEntitiesByClass(Skeleton.class)) {
+//
+//                            if (necro.isDead()) continue;
+//
+//                            // Spawn minion
+//                            Skeleton minion = (Skeleton) world.spawnEntity(necro.getLocation().add(Math.random() * 2 - 1, 0, Math.random() * 2 - 1), EntityType.SKELETON);
+//                            minion.setCustomName("§7Undead Minion");
+//                            minion.setCustomNameVisible(true);
+//                            minion.setShouldBurnInDay(false); // Sunlight immunity
+//                            minion.getEquipment().clear(); // Optional: make them bare
+//                            minion.setTarget(getNearestPlayer(necro.getLocation()));
+//
+//                            // Tag minion (optional)
+//                            minion.getPersistentDataContainer().set(new NamespacedKey(YourPlugin.getInstance(), "minion"), PersistentDataType.INTEGER, 1);
+//
+//                    }
+//                }
+//            }
+//
+//    }
 }
+
+
