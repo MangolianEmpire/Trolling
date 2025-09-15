@@ -8,6 +8,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,17 +62,21 @@ public class ChallengeLoader {
         MiniBosses miniBosses = new MiniBosses(trolling);
         challenges.add(miniBosses);
 
+        ChorusInfection chorusInfection = new ChorusInfection(trolling);
+        challenges.add(chorusInfection);
+
+        Heartbroken heartbroken = new Heartbroken(trolling);
+        challenges.add(heartbroken);
+
         MrPh8terHater mrPh8terHater = new MrPh8terHater(trolling);
         mrPh8terHater.activate();
         challenges.add(mrPh8terHater);
-
 
         // active saved challenges
         for (CustomChallenge challenge : challenges) {
             boolean active = config.getBoolean("challenges." + challenge.getChallengeName(), false);
             if (active) challenge.activate();
         }
-
 
         // FallDamage
         customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
@@ -143,6 +148,22 @@ public class ChallengeLoader {
                 Component.text("Minibosses", NamedTextColor.GOLD),
                 Component.text("They are dangerous and bring custom loot with them!", NamedTextColor.GOLD),
                 miniBosses
+        ));
+
+        // ChorusInfection
+        customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
+                Material.CHORUS_FRUIT,
+                Component.text("Chorus Infection", NamedTextColor.DARK_PURPLE),
+                Component.text("Why does the food taste like that?", NamedTextColor.DARK_PURPLE),
+                chorusInfection
+        ));
+
+        // Heartbroken
+        customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
+                Material.GHAST_TEAR,
+                Component.text("Heartbroken", NamedTextColor.RED),
+                Component.text("Why did she leave me :(", NamedTextColor.RED),
+                heartbroken
         ));
     }
 

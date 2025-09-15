@@ -33,8 +33,15 @@ public class GameChangeListener implements Listener {
             World gameOverWorld = Bukkit.getWorld("game_overworld");
             Bukkit.getWorlds().forEach(world -> {
                 world.setDifficulty(Difficulty.HARD);
-                world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);});
-            Bukkit.getOnlinePlayers().forEach(PlayerInitUtils::initPlayerGame);
+                world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+                world.setClearWeatherDuration(20 * 60 * 5);});
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (gameManager.getGameMode() == de.mangole.trolling.GameMode.FORTNITE) {
+                    PlayerInitUtils.initPlayerFortnite(player);
+                } else {
+                    PlayerInitUtils.initPlayerGame(player);
+                }
+            }
             gameOverWorld.setTime(1000);
         }
 
