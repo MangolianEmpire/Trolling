@@ -59,6 +59,9 @@ public class ChallengeLoader {
         FloodedWorld floodedWorld = new FloodedWorld(trolling);
         challenges.add(floodedWorld);
 
+        MiniBosses miniBosses = new MiniBosses(trolling);
+        challenges.add(miniBosses);
+
         ChorusInfection chorusInfection = new ChorusInfection(trolling);
         challenges.add(chorusInfection);
 
@@ -137,6 +140,14 @@ public class ChallengeLoader {
                 Component.text("Atlantis", NamedTextColor.BLUE),
                 Component.text("Climate Change kicks your balls", NamedTextColor.BLUE),
                 floodedWorld
+        ));
+
+        // Minibosses
+        customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
+                Material.MACE,
+                Component.text("Minibosses", NamedTextColor.GOLD),
+                Component.text("They are dangerous and bring custom loot with them!", NamedTextColor.GOLD),
+                miniBosses
         ));
 
         // ChorusInfection
