@@ -4,6 +4,7 @@ import de.mangole.trolling.GameMode;
 import de.mangole.trolling.GameStatus;
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.utils.ReviveBeacon;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -114,16 +115,6 @@ public class GameModeFortnite extends GameModeBase {
     }
 
     @GameModeEvent
-    public void onInventoryOpen(InventoryOpenEvent event) {
-        if (!(event.getInventory().getHolder() instanceof Player spectator)) return;
-        if (fortniteSpectator.getSpectators().contains(spectator)) {
-            if (event.getInventory().equals(fortniteSpectator.getSpectatingInventory(spectator))) return;
-
-            event.setCancelled(true);
-        }
-    }
-
-    @GameModeEvent
     public void onItemDrop(PlayerDropItemEvent event) {
         Player spectator = event.getPlayer();
         if (fortniteSpectator.getSpectators().contains(spectator)) {
@@ -223,6 +214,15 @@ public class GameModeFortnite extends GameModeBase {
                 player.setGliding(false);
             }
         }
+    }
+
+    @GameModeEvent
+    public void onSkyOpenInventory(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (!fortniteSpawnPlayers.contains(player)) return;
+
+        event.setCancelled(true);
+        player.closeInventory();
     }
 
 
