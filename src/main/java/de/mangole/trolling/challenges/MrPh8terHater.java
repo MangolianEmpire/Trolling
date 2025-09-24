@@ -95,7 +95,7 @@ public class MrPh8terHater extends CustomChallenge {
     public void onLightningStrike(LightningStrikeEvent event) {
         if (event.getLightning().hasMetadata("customStrike")) return; // ignore custom strikes
 
-        if (new Random().nextDouble() > 0.4) return;
+        if (new Random().nextDouble() > 0.0) return;
 
         Player target = Bukkit.getPlayerExact(VICTIM_NAME);
         if (target != null && target.getWorld().equals(event.getWorld())) {
