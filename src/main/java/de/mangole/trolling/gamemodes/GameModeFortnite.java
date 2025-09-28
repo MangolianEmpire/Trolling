@@ -203,14 +203,12 @@ public class GameModeFortnite extends GameModeBase {
         if (!fortniteSpawnPlayers.contains(player)) return;
 
         if (event.hasChangedBlock() && isOnGround(player)) {
-            if (player.getInventory().getChestplate() != null &&
-                    player.getInventory().getChestplate().getType() == Material.ELYTRA) {
 
                 player.getInventory().setChestplate(null);
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
                 fortniteSpawnPlayers.remove(player);
                 player.setGliding(false);
-            }
+
         }
     }
 

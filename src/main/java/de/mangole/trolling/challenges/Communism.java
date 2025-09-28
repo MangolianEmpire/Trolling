@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 
 public class Communism extends CustomChallenge {
@@ -24,6 +25,20 @@ public class Communism extends CustomChallenge {
 
     @EventHandler
     public void onDamage(EntityDamageEvent e) {
+        if (!(e.getEntity() instanceof Player player)) return;
+
+        Bukkit.getScheduler().runTaskLater(trolling, () -> {
+            double newHealth = player.getHealth();
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (p != player) {
+                    p.setHealth(Math.min(newHealth, p.getMaxHealth()));
+                }
+            }
+        }, 1L);
+    }
+
+    @EventHandler
+    public void onHeal(EntityRegainHealthEvent e) {
         if (!(e.getEntity() instanceof Player player)) return;
 
         Bukkit.getScheduler().runTaskLater(trolling, () -> {

@@ -43,6 +43,8 @@ public class PlayerInitUtils {
                 progress.revokeCriteria(criteria);
             }
         }
+
+        GameModeFortnite.fortniteSpawnPlayers.remove(player);
     }
 
     public static void initPlayerGame(Player player) {
