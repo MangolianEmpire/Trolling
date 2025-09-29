@@ -252,7 +252,6 @@ public class TheCrazyMobs extends CustomChallenge {
         if (!(pig.getKiller() instanceof Player killer)) return;
 
         if (pig.isAdult()) {
-            // Drop Inventar am Pig-Ort.
             for (ItemStack item : killer.getInventory().getContents()) {
                 if (item != null) {
                     pig.getWorld().dropItemNaturally(pig.getLocation(), item);
@@ -260,7 +259,7 @@ public class TheCrazyMobs extends CustomChallenge {
             }
             killer.getInventory().clear();
         } else {
-            // Baby: Inventar verschwindet.
+            killer.getWorld().playSound(killer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
             killer.getInventory().clear();
         }
     }
