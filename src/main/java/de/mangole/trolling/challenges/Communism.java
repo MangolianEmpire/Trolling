@@ -30,11 +30,11 @@ public class Communism extends CustomChallenge {
     public void onDamage(EntityDamageEvent e) {
         if (!(e.getEntity() instanceof Player player)) return;
 
+        double finalDamage = e.getFinalDamage();
 
-        double newHealth = player.getHealth();
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p != player) {
-                p.setHealth(Math.min(newHealth, p.getMaxHealth()));
+                p.setHealth(Math.max(player.getHealth() - finalDamage, 0));
             }
         }
     }
