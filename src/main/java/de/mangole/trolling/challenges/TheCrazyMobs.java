@@ -12,6 +12,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
 
@@ -243,6 +244,25 @@ public class TheCrazyMobs extends CustomChallenge {
         }
 
         return nearestPlayer;
+    }
+
+    @EventHandler
+    public void onPigDeath(EntityDeathEvent event) {
+        if (!(event.getEntity() instanceof Pig pig)) return;
+        if (!(pig.getKiller() instanceof Player killer)) return;
+
+        if (pig.isAdult()) {
+            // Drop Inventar am Pig-Ort.
+            for (ItemStack item : killer.getInventory().getContents()) {
+                if (item != null) {
+                    pig.getWorld().dropItemNaturally(pig.getLocation(), item);
+                }
+            }
+            killer.getInventory().clear();
+        } else {
+            // Baby: Inventar verschwindet.
+            killer.getInventory().clear();
+        }
     }
 
 }
