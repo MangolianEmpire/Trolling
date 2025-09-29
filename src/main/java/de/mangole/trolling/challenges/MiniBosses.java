@@ -56,26 +56,27 @@ public class MiniBosses extends CustomChallenge {
         @NotNull Entity mob = event.getEntity();
         Random random = new Random();
 
-        if (mob instanceof Slime && random.nextDouble() <= 0.08) {
+        if (mob instanceof Slime && random.nextDouble() <= 0.07) {
+            if (mob.getType() == EntityType.MAGMA_CUBE) return;
             event.setCancelled(true);
             isSpawningBoss = true;
             spawnSlimeBoss(mob.getLocation());
             isSpawningBoss = false;
         }
 
-        if (mob instanceof Blaze && random.nextDouble() <= 0.05) {
+        if (mob instanceof Blaze && random.nextDouble() <= 0.025) {
             event.setCancelled(true);
             isSpawningBoss = true;
             spawnBlazeBoss(mob.getLocation());
             isSpawningBoss = false;
         }
 
-//        if (mob instanceof Skeleton) {
-//            event.setCancelled(true);
-//            isSpawningBoss = true;
-//            spawnNecromancer(mob.getLocation());
-//            isSpawningBoss = false;
-//        }
+        if (mob instanceof Skeleton) {
+            event.setCancelled(true);
+            isSpawningBoss = true;
+            spawnNecromancer(mob.getLocation());
+            isSpawningBoss = false;
+        }
     }
 
 
@@ -295,48 +296,95 @@ public class MiniBosses extends CustomChallenge {
 
     // Dark Necromancer
 
-//    public void spawnNecromancer(@NotNull Location loc) {
-//        WitherSkeleton necromancer = (WitherSkeleton) loc.getWorld().spawnEntity(loc, EntityType.WITHER_SKELETON);
-//
-//        necromancer.customName(Component.text("Ashen Tyrant", NamedTextColor.GRAY));
-//        necromancer.setCustomNameVisible(true);
-//        necromancer.getEquipment().setItemInMainHand(new ItemStack(Material.ENCHANTED_BOOK));
-//        necromancer.getEquipment().setItemInMainHandDropChance(0f); // Don't drop book
-//        necromancer.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET)); // Optional cosmetic
-//        necromancer.setMetadata("isBoss", new FixedMetadataValue(trolling, true));
-//        necromancer.setShouldBurnInDay(false); // Sunlight immunity
-//        Objects.requireNonNull(necromancer.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(60);
-//        necromancer.setHealth(60);
-//
-//        startNecromancing(necromancer);
-//    }
-//
-//    private void startNecromancing(WitherSkeleton necromancer) {
-//        new BukkitRunnable() {
-//
-//            @Override
-//            public void run () {
-//                for (World world : Bukkit.getWorlds()) {
-//                    for (Entity entity : world.getEntitiesByClass(Skeleton.class)) {
-//
-//                            if (necro.isDead()) continue;
-//
-//                            // Spawn minion
-//                            Skeleton minion = (Skeleton) world.spawnEntity(necro.getLocation().add(Math.random() * 2 - 1, 0, Math.random() * 2 - 1), EntityType.SKELETON);
-//                            minion.setCustomName("§7Undead Minion");
-//                            minion.setCustomNameVisible(true);
-//                            minion.setShouldBurnInDay(false); // Sunlight immunity
-//                            minion.getEquipment().clear(); // Optional: make them bare
-//                            minion.setTarget(getNearestPlayer(necro.getLocation()));
-//
-//                            // Tag minion (optional)
-//                            minion.getPersistentDataContainer().set(new NamespacedKey(YourPlugin.getInstance(), "minion"), PersistentDataType.INTEGER, 1);
-//
-//                    }
-//                }
-//            }
-//
-//    }
+    public void spawnNecromancer(@NotNull Location loc) {
+        WitherSkeleton necromancer = (WitherSkeleton) loc.getWorld().spawnEntity(loc, EntityType.WITHER_SKELETON);
+
+        necromancer.customName(Component.text("Dark Necromancer", NamedTextColor.GRAY));
+        necromancer.setCustomNameVisible(true);
+        necromancer.getEquipment().setItemInMainHand(new ItemStack(Material.ENCHANTED_BOOK));
+        necromancer.getEquipment().setItemInMainHandDropChance(0f); // Don't drop book
+        necromancer.getEquipment().setHelmet(new ItemStack(Material.GOLDEN_HELMET)); // Optional cosmetic
+        necromancer.setMetadata("isBoss", new FixedMetadataValue(trolling, true));
+        necromancer.setShouldBurnInDay(false); // Sunlight immunity
+        necromancer.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Integer.MAX_VALUE, 1, false, false));
+        Objects.requireNonNull(necromancer.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(60);
+        necromancer.setHealth(60);
+
+        startNecromancing(necromancer);
+        startSoulParticles(necromancer);
+    }
+
+    private void startSoulParticles(WitherSkeleton necromancer) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!necromancer.isValid() || necromancer.isDead()) {
+                    cancel();
+                    return;
+                }
+                necromancer.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, necromancer.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.01);
+                necromancer.getWorld().spawnParticle(Particle.SCULK_SOUL, necromancer.getLocation().add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.01);
+            }
+        }.runTaskTimer(trolling, 0L, 10L); // Every 0.5 seconds
+    }
+
+    private void startNecromancing(WitherSkeleton necromancer) {
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                if (necromancer == null || necromancer.isDead() || !necromancer.isValid()) {
+                    this.cancel(); // Stop the task
+                    return;
+                }
+
+                if (necromancer.getTarget() == null) {
+                    return;
+                }
+
+                Location loc = necromancer.getLocation();
+                necromancer.getWorld().playSound(necromancer.getLocation(), Sound.BLOCK_TRIAL_SPAWNER_OMINOUS_ACTIVATE, 1, 2);
+
+
+                isSpawningBoss = true;
+                // Skeleton 1: Iron Axe
+                Skeleton axeSkeleton = (Skeleton) loc.getWorld().spawnEntity(loc.clone().add(0, 0, 0), EntityType.SKELETON);
+                axeSkeleton.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+                axeSkeleton.getEquipment().setItemInMainHand(new ItemStack(Material.IRON_AXE));
+                axeSkeleton.getEquipment().setHelmetDropChance(0f);
+                axeSkeleton.getEquipment().setItemInMainHandDropChance(0f);
+                axeSkeleton.setShouldBurnInDay(false);
+                axeSkeleton.setTarget(necromancer.getTarget());
+
+                // Skeleton 2: Sword + Shield
+                Skeleton swordShieldSkeleton = (Skeleton) loc.getWorld().spawnEntity(loc.clone().add(0, 0, 0), EntityType.SKELETON);
+                swordShieldSkeleton.getEquipment().setItemInMainHand(new ItemStack(Material.IRON_SWORD));
+                swordShieldSkeleton.getEquipment().setItemInOffHand(new ItemStack(Material.SHIELD));
+                swordShieldSkeleton.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+                swordShieldSkeleton.getEquipment().setItemInMainHandDropChance(0f);
+                swordShieldSkeleton.getEquipment().setItemInOffHandDropChance(0f);
+                swordShieldSkeleton.getEquipment().setHelmetDropChance(0f);
+                swordShieldSkeleton.setShouldBurnInDay(false);
+                swordShieldSkeleton.setTarget(necromancer.getTarget());
+
+                // Skeleton 3: Bow
+                Skeleton scytheSkeleton = (Skeleton) loc.getWorld().spawnEntity(loc.clone().add(0, 0, 0), EntityType.SKELETON);
+                scytheSkeleton.getEquipment().setItemInMainHand(new ItemStack(Material.NETHERITE_HOE));
+                scytheSkeleton.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
+                scytheSkeleton.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 2));
+                scytheSkeleton.getEquipment().setItemInMainHandDropChance(0f);
+                scytheSkeleton.getEquipment().setHelmetDropChance(0f);
+                scytheSkeleton.setShouldBurnInDay(false);
+                scytheSkeleton.setTarget(necromancer.getTarget());
+
+                axeSkeleton.setCustomNameVisible(false);
+                swordShieldSkeleton.setCustomNameVisible(false);
+                scytheSkeleton.setCustomNameVisible(false);
+
+                isSpawningBoss = false;
+            }
+        }.runTaskTimer(trolling, 0L, 20L * 15);
+    }
 }
 
 
