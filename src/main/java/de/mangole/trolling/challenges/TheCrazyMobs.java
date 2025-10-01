@@ -14,6 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
 
@@ -334,6 +335,24 @@ public class TheCrazyMobs extends CustomChallenge {
         }
 
         return nearestPlayer;
+    }
+
+    @EventHandler
+    public void onPigDeath(EntityDeathEvent event) {
+        if (!(event.getEntity() instanceof Pig pig)) return;
+        if (!(pig.getKiller() instanceof Player killer)) return;
+
+        if (pig.isAdult()) {
+            for (ItemStack item : killer.getInventory().getContents()) {
+                if (item != null) {
+                    pig.getWorld().dropItemNaturally(pig.getLocation(), item);
+                }
+            }
+            killer.getInventory().clear();
+        } else {
+            killer.getWorld().playSound(killer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
+            killer.getInventory().clear();
+        }
     }
 
 }

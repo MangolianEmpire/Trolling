@@ -23,7 +23,7 @@ import java.util.Random;
 
 public class MrPh8terHater extends CustomChallenge {
 
-    private static final String VICTIM_NAME = "MrPh8ter";
+    private static final String VICTIM_NAME = "Xander_008";
 
 
     public MrPh8terHater(Trolling trolling) {
