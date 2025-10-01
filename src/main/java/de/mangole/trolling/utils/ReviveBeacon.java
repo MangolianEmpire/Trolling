@@ -41,6 +41,8 @@ public class ReviveBeacon implements Listener {
         this.reviveDuration = reviveDuration;
         this.block = block;
 
+        Bukkit.getPluginManager().registerEvents(this, trolling);
+
         oldBlock = block.getType();
         block.setType(Material.BEACON);
         foundation = new Block[9];
@@ -56,8 +58,6 @@ public class ReviveBeacon implements Listener {
                 i++;
             }
         }
-
-        Bukkit.getPluginManager().registerEvents(this, trolling);
 
         reviveTask = reviveTask();
     }

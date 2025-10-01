@@ -255,7 +255,7 @@ public class TheCrazyMobs extends CustomChallenge {
                     }
                 }
             }
-        }.runTaskTimer(trolling, 0L, 20L);
+        }.runTaskTimer(trolling, 0L, 10L);
     }
 
     private Player getNearestVisiblePlayer(Bat bat) {
@@ -280,7 +280,7 @@ public class TheCrazyMobs extends CustomChallenge {
 
         bat.setTarget(target);
 
-        if (distance <= 3.0) {
+        if (distance <= 4.0) {
             explodeBat(bat);
             return;
         }

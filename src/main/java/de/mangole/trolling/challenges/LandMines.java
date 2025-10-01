@@ -1,4 +1,5 @@
 package de.mangole.trolling.challenges;
+
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.utils.CustomChallenge;
 import org.bukkit.*;
@@ -7,11 +8,14 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerMoveEvent;
+
 import java.util.*;
+
 public class LandMines extends CustomChallenge {
     private final Random random = new Random();
     private final Set<Material> mineMaterials = new HashSet<>();
     private final Map<UUID, Long> playerCooldowns = new HashMap<>();
+
     public LandMines(Trolling trolling) {
         super(trolling, "LandMines");
         mineMaterials.add(Material.SAND);
@@ -27,14 +31,15 @@ public class LandMines extends CustomChallenge {
         mineMaterials.add(Material.FARMLAND);
         mineMaterials.add(Material.CRIMSON_NYLIUM);
     }
+
     @Override
     protected void onActivate() {
-        trolling.getServer().getPluginManager().registerEvents(this, trolling);
     }
+
     @Override
     protected void onDeactivate() {
-        HandlerList.unregisterAll(this);
     }
+
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
@@ -67,7 +72,7 @@ public class LandMines extends CustomChallenge {
         if (random.nextDouble() < 0.0025) {
             world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, underLoc, 100, 0.5, 0.5, 0.5, 0.1);
             world.playSound(underLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 1.0f);
-            world.createExplosion(player.getLocation(), 36.0f, true, true);
+            world.createExplosion(player.getLocation(), 30.0f, true, true);
         }
     }
 }
