@@ -7,6 +7,7 @@ import de.mangole.trolling.utils.ChallengeEvent;
 import de.mangole.trolling.utils.CustomChallenge;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,7 +38,6 @@ public class NoOneLeftBehind extends CustomChallenge {
 
     @Override
     protected void onActivate() {
-        trolling.getServer().sendMessage(Component.text("No one left Behind activated"));
     }
 
     @Override
@@ -57,16 +57,22 @@ public class NoOneLeftBehind extends CustomChallenge {
                     cancel();
                 }
                 for(Player player : trolling.getServer().getOnlinePlayers()){
-                    List<Entity> nearbyEntities = player.getNearbyEntities(15, 15,15);
-                    for (Entity entity : nearbyEntities){
-                        if (entity instanceof Player closePlayer && closePlayer.getGameMode() == GameMode.SURVIVAL){
-                            return;
-                        }
-                    }
+                    List<Entity> nearbyEntities = player.getNearbyEntities(20, 20,20);
+                    if (hasNearbyPlayers(nearbyEntities)) continue;
+                    trolling.getServer().sendMessage(Component.text(player.getName() + ": " + FUNNY_TEXTS[new Random().nextInt(0, FUNNY_TEXTS.length - 1)]));
                     player.sendRawMessage(FUNNY_TEXTS[new Random().nextInt(0, FUNNY_TEXTS.length - 1)]);
                     player.damage(2);
                 }
             }
         }.runTaskTimer(trolling, 0L, 20L * 3);
+    }
+
+    private static boolean hasNearbyPlayers(List<Entity> nearbyEntities) {
+        for (Entity entity : nearbyEntities){
+            if (entity instanceof Player closePlayer && closePlayer.getGameMode() == GameMode.SURVIVAL){
+                return true;
+            }
+        }
+        return false;
     }
 }
