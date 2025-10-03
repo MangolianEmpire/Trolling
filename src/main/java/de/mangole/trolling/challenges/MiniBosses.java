@@ -10,10 +10,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
-import org.bukkit.event.entity.SlimeSplitEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
@@ -27,6 +24,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
@@ -56,26 +54,27 @@ public class MiniBosses extends CustomChallenge {
         @NotNull Entity mob = event.getEntity();
         Random random = new Random();
 
-        if (mob instanceof Slime && random.nextDouble() <= 0.08) {
+        if (mob instanceof Slime && random.nextDouble() <= 0.07) {
+            if (mob.getType() == EntityType.MAGMA_CUBE) return;
             event.setCancelled(true);
             isSpawningBoss = true;
             spawnSlimeBoss(mob.getLocation());
             isSpawningBoss = false;
         }
 
-        if (mob instanceof Blaze && random.nextDouble() <= 0.05) {
+        if (mob instanceof Blaze && random.nextDouble() <= 0.025) {
             event.setCancelled(true);
             isSpawningBoss = true;
             spawnBlazeBoss(mob.getLocation());
             isSpawningBoss = false;
         }
 
-//        if (mob instanceof Skeleton) {
-//            event.setCancelled(true);
-//            isSpawningBoss = true;
-//            spawnNecromancer(mob.getLocation());
-//            isSpawningBoss = false;
-//        }
+        if (mob instanceof Skeleton && random.nextDouble() <= 0.03) {
+            event.setCancelled(true);
+            isSpawningBoss = true;
+            spawnNecromancer(mob.getLocation());
+            isSpawningBoss = false;
+        }
     }
 
 
@@ -295,48 +294,201 @@ public class MiniBosses extends CustomChallenge {
 
     // Dark Necromancer
 
-//    public void spawnNecromancer(@NotNull Location loc) {
-//        WitherSkeleton necromancer = (WitherSkeleton) loc.getWorld().spawnEntity(loc, EntityType.WITHER_SKELETON);
-//
-//        necromancer.customName(Component.text("Ashen Tyrant", NamedTextColor.GRAY));
-//        necromancer.setCustomNameVisible(true);
-//        necromancer.getEquipment().setItemInMainHand(new ItemStack(Material.ENCHANTED_BOOK));
-//        necromancer.getEquipment().setItemInMainHandDropChance(0f); // Don't drop book
-//        necromancer.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET)); // Optional cosmetic
-//        necromancer.setMetadata("isBoss", new FixedMetadataValue(trolling, true));
-//        necromancer.setShouldBurnInDay(false); // Sunlight immunity
-//        Objects.requireNonNull(necromancer.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(60);
-//        necromancer.setHealth(60);
-//
-//        startNecromancing(necromancer);
-//    }
-//
-//    private void startNecromancing(WitherSkeleton necromancer) {
-//        new BukkitRunnable() {
-//
-//            @Override
-//            public void run () {
-//                for (World world : Bukkit.getWorlds()) {
-//                    for (Entity entity : world.getEntitiesByClass(Skeleton.class)) {
-//
-//                            if (necro.isDead()) continue;
-//
-//                            // Spawn minion
-//                            Skeleton minion = (Skeleton) world.spawnEntity(necro.getLocation().add(Math.random() * 2 - 1, 0, Math.random() * 2 - 1), EntityType.SKELETON);
-//                            minion.setCustomName("§7Undead Minion");
-//                            minion.setCustomNameVisible(true);
-//                            minion.setShouldBurnInDay(false); // Sunlight immunity
-//                            minion.getEquipment().clear(); // Optional: make them bare
-//                            minion.setTarget(getNearestPlayer(necro.getLocation()));
-//
-//                            // Tag minion (optional)
-//                            minion.getPersistentDataContainer().set(new NamespacedKey(YourPlugin.getInstance(), "minion"), PersistentDataType.INTEGER, 1);
-//
-//                    }
-//                }
-//            }
-//
-//    }
+    public void spawnNecromancer(@NotNull Location loc) {
+        WitherSkeleton necromancer = (WitherSkeleton) loc.getWorld().spawnEntity(loc, EntityType.WITHER_SKELETON);
+
+        necromancer.customName(Component.text("Dark Necromancer", NamedTextColor.GRAY));
+        necromancer.setCustomNameVisible(true);
+        necromancer.getEquipment().setItemInMainHand(new ItemStack(Material.ENCHANTED_BOOK));
+        necromancer.getEquipment().setItemInMainHandDropChance(0f); // Don't drop book
+        necromancer.getEquipment().setHelmet(new ItemStack(Material.GOLDEN_HELMET)); // Optional cosmetic
+        necromancer.setMetadata("isBoss", new FixedMetadataValue(trolling, true));
+        necromancer.setShouldBurnInDay(false); // Sunlight immunity
+        necromancer.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, Integer.MAX_VALUE, 1, false, false));
+        Objects.requireNonNull(necromancer.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(80);
+        necromancer.setHealth(80);
+
+        startNecromancing(necromancer);
+        startSoulParticles(necromancer);
+    }
+
+    private void startSoulParticles(WitherSkeleton necromancer) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!necromancer.isValid() || necromancer.isDead()) {
+                    cancel();
+                    return;
+                }
+                necromancer.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, necromancer.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.01);
+                necromancer.getWorld().spawnParticle(Particle.SCULK_SOUL, necromancer.getLocation().add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.01);
+            }
+        }.runTaskTimer(trolling, 0L, 10L); // Every 0.5 seconds
+    }
+
+    private void startNecromancing(WitherSkeleton necromancer) {
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                if (necromancer == null || necromancer.isDead() || !necromancer.isValid()) {
+                    this.cancel(); // Stop the task
+                    return;
+                }
+
+                if (necromancer.getTarget() == null) {
+                    return;
+                }
+
+                Location loc = necromancer.getLocation();
+                necromancer.getWorld().playSound(necromancer.getLocation(), Sound.BLOCK_TRIAL_SPAWNER_OMINOUS_ACTIVATE, 1, 2);
+
+
+                isSpawningBoss = true;
+                // Skeleton 1: Iron Axe
+                Skeleton axeSkeleton = (Skeleton) loc.getWorld().spawnEntity(loc.clone().add(0, 0, 0), EntityType.SKELETON);
+                axeSkeleton.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+                axeSkeleton.getEquipment().setItemInMainHand(new ItemStack(Material.IRON_AXE));
+                axeSkeleton.getEquipment().setHelmetDropChance(0f);
+                axeSkeleton.getEquipment().setItemInMainHandDropChance(0f);
+                axeSkeleton.setShouldBurnInDay(false);
+                axeSkeleton.setTarget(necromancer.getTarget());
+
+                // Skeleton 2: Sword + Shield
+                Skeleton swordShieldSkeleton = (Skeleton) loc.getWorld().spawnEntity(loc.clone().add(0, 0, 0), EntityType.SKELETON);
+                swordShieldSkeleton.getEquipment().setItemInMainHand(new ItemStack(Material.IRON_SWORD));
+                swordShieldSkeleton.getEquipment().setItemInOffHand(new ItemStack(Material.SHIELD));
+                swordShieldSkeleton.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+                swordShieldSkeleton.getEquipment().setItemInMainHandDropChance(0f);
+                swordShieldSkeleton.getEquipment().setItemInOffHandDropChance(0f);
+                swordShieldSkeleton.getEquipment().setHelmetDropChance(0f);
+                swordShieldSkeleton.setShouldBurnInDay(false);
+                swordShieldSkeleton.setTarget(necromancer.getTarget());
+
+                // Skeleton 3: Bow
+                Skeleton scytheSkeleton = (Skeleton) loc.getWorld().spawnEntity(loc.clone().add(0, 0, 0), EntityType.SKELETON);
+                scytheSkeleton.getEquipment().setItemInMainHand(new ItemStack(Material.NETHERITE_HOE));
+                scytheSkeleton.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
+                scytheSkeleton.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 2));
+                scytheSkeleton.getEquipment().setItemInMainHandDropChance(0f);
+                scytheSkeleton.getEquipment().setHelmetDropChance(0f);
+                scytheSkeleton.setShouldBurnInDay(false);
+                scytheSkeleton.setTarget(necromancer.getTarget());
+
+                axeSkeleton.setCustomNameVisible(false);
+                swordShieldSkeleton.setCustomNameVisible(false);
+                scytheSkeleton.setCustomNameVisible(false);
+
+                isSpawningBoss = false;
+            }
+        }.runTaskTimer(trolling, 0L, 20L * 10);
+    }
+
+
+    @EventHandler
+    public void onNecromancerDeath(EntityDeathEvent event) {
+        if (!(event.getEntity() instanceof WitherSkeleton witherSkeleton)) return;
+        if (witherSkeleton.hasMetadata("isBoss")) {
+            ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
+            ItemMeta itemMeta = book.getItemMeta();
+            NamespacedKey key = new NamespacedKey(trolling, "summoning_book");
+            itemMeta.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
+            itemMeta.displayName(Component.text("Necromancer's Summoning Tome", NamedTextColor.GRAY));
+            itemMeta.lore(Collections.singletonList(Component.text("Right-click to summon skeletal minions that attack anything but you!", NamedTextColor.GRAY)));
+            book.setItemMeta(itemMeta);
+            event.getDrops().add(book);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerUseSummoningBook(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK)
+            return;
+
+
+        Player player = event.getPlayer();
+        if (player.getCooldown(Material.ENCHANTED_BOOK) > 0) return;
+
+        ItemStack item = event.getItem();
+        if (item == null || item.getType() != Material.ENCHANTED_BOOK) return;
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null || !meta.getPersistentDataContainer().has(new NamespacedKey(trolling, "summoning_book"), PersistentDataType.BYTE))
+            return;
+
+        event.setCancelled(true);
+        player.setCooldown(Material.ENCHANTED_BOOK, 20 * 180);
+        summonMinions(player.getLocation(), player);
+    }
+
+    private void summonMinions(Location location, Player owner) {
+        isSpawningBoss = true;
+        owner.getWorld().playSound(owner.getLocation(), Sound.BLOCK_TRIAL_SPAWNER_OMINOUS_ACTIVATE, 1, 2);
+        owner.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, owner.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.01);
+        owner.getWorld().spawnParticle(Particle.SCULK_SOUL, owner.getLocation().add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.01);
+        for (int i = 0; i < 3; i++) {
+            Skeleton minion = (Skeleton) location.getWorld().spawnEntity(location, EntityType.SKELETON);
+            minion.customName(Component.text(owner.getName() + "'s Minion", NamedTextColor.WHITE));
+            minion.setCustomNameVisible(true);
+            minion.setShouldBurnInDay(false);
+            minion.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
+            minion.getEquipment().setItemInMainHand(new ItemStack(Material.STONE_SWORD));
+            minion.getEquipment().setHelmetDropChance(0f);
+            minion.getEquipment().setItemInMainHandDropChance(0f);
+            minion.setMetadata("isMinion", new FixedMetadataValue(trolling, true));
+
+            minion.getPersistentDataContainer().set(new NamespacedKey(trolling, "owner_uuid"), PersistentDataType.STRING, owner.getUniqueId().toString());
+
+            // Optional: make them stronger
+            minion.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 20 * 90, 1));
+
+            startTargetingHostileMobs(minion, owner);
+
+
+            // Despawn after 1 minute
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    minion.getWorld().playSound(minion.getLocation(), Sound.BLOCK_TRIAL_SPAWNER_OMINOUS_ACTIVATE, 1, 0.3f);
+                    owner.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, owner.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.01);
+                    owner.getWorld().spawnParticle(Particle.SCULK_SOUL, owner.getLocation().add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.01);
+                    if (!minion.isDead()) minion.remove();
+                }
+            }.runTaskLater(trolling, 20L * 60);
+        }
+        isSpawningBoss = false;
+    }
+
+    @EventHandler
+    public void onMinionTarget(EntityTargetEvent event) {
+        if (!(event.getEntity() instanceof Skeleton)) return;
+        if (!event.getEntity().hasMetadata("isMinion")) return;
+
+        if (event.getTarget() instanceof Player) {
+            event.setCancelled(true);
+        }
+    }
+
+    private void startTargetingHostileMobs(Skeleton minion, Player owner) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!minion.isValid() || minion.isDead()) {
+                    cancel();
+                    return;
+                }
+                if (minion.getTarget() != null) return;
+
+                List<Entity> nearby = minion.getNearbyEntities(10, 5, 10);
+                for (Entity e : nearby) {
+                    if (e instanceof LivingEntity && e != owner && !(e.hasMetadata("isMinion"))) {
+                        minion.setTarget((LivingEntity) e);
+                        break;
+                    }
+                }
+            }
+        }.runTaskTimer(trolling, 0L, 40L); // Every 2 seconds
+    }
 }
 
 
