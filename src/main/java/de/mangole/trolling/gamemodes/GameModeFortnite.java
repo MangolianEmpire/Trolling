@@ -1,12 +1,12 @@
 package de.mangole.trolling.gamemodes;
 
+import de.mangole.trolling.GameManager;
 import de.mangole.trolling.GameMode;
 import de.mangole.trolling.GameStatus;
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.utils.ReviveBeacon;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.*;
@@ -17,17 +17,33 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class GameModeFortnite extends GameModeBase {
 
     public static ArrayList<ReviveBeacon> reviveBeacons = new ArrayList<>();
-    public static ArrayList<Player> fortniteSpawnPlayers = new ArrayList<>();
+    public static Set<Player> fortniteSpawnPlayers = new HashSet<>();
     private final FortniteSpectator fortniteSpectator;
 
-    public GameModeFortnite(Trolling trolling) {
-        super(trolling, GameMode.FORTNITE);
+    public GameModeFortnite(Trolling trolling, GameManager gameManager) {
+        super(trolling, gameManager, GameMode.FORTNITE);
         this.fortniteSpectator = new FortniteSpectator(trolling);
+    }
+
+    // rejoin and restart logic
+
+    @GameModeEvent
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        for (ReviveBeacon beacon : reviveBeacons) {
+            if (beacon != null && beacon.getRevivePlayer() != null && beacon.getRevivePlayer().getUniqueId().equals(player.getUniqueId())) {
+                beacon.setRevivePlayer(player);
+                player.teleport(beacon.getReviveLocation().add(0.5, 0, 0.5));
+                fortniteSpectator.setFortniteSpectator(player);
+            }
+        }
     }
 
     // Revive Logic
@@ -219,6 +235,14 @@ public class GameModeFortnite extends GameModeBase {
 
         event.setCancelled(true);
         player.closeInventory();
+    }
+
+    @GameModeEvent
+    public void onSpawnDeath(PlayerDeathEvent event) {
+        Player player = event.getPlayer();
+        if (!fortniteSpawnPlayers.contains(player)) return;
+
+        player.getInventory().clear();
     }
 
 

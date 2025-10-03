@@ -2,12 +2,12 @@ package de.mangole.trolling.challenges;
 
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.WorldManager;
+import de.mangole.trolling.utils.ChallengeEvent;
 import de.mangole.trolling.utils.CustomChallenge;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -33,7 +33,7 @@ public class FloodedWorld extends CustomChallenge {
 
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onChunkLoad(ChunkLoadEvent event) {
         Chunk chunk = event.getChunk();
         World world = chunk.getWorld();

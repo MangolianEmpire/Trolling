@@ -1,9 +1,9 @@
 package de.mangole.trolling.challenges;
 
 import de.mangole.trolling.Trolling;
+import de.mangole.trolling.utils.ChallengeEvent;
 import de.mangole.trolling.utils.CustomChallenge;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 public class FallChallenge extends CustomChallenge {
@@ -20,7 +20,7 @@ public class FallChallenge extends CustomChallenge {
     protected void onDeactivate() {
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onFallDamage(EntityDamageEvent event) {
         if (!isActive()) return;
         if (!(event.getEntity() instanceof Player player)) return;

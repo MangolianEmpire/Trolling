@@ -1,17 +1,20 @@
 package de.mangole.trolling;
 
 import de.mangole.trolling.events.GameChangeEvent;
+import de.mangole.trolling.gamemodes.*;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class GameManager {
 
     private final Trolling trolling;
     private final File statusFile;
     private final YamlConfiguration config;
+    private ArrayList<GameModeBase> gameModes = new ArrayList<>();
 
     private GameStatus gameStatus = GameStatus.LOBBY;
     private GameMode gameMode = GameMode.CASUAL;
@@ -20,6 +23,10 @@ public class GameManager {
         this.trolling = trolling;
         this.statusFile = new File(trolling.getDataFolder(), "status.yml");
         this.config = YamlConfiguration.loadConfiguration(statusFile);
+        this.gameModes.add(new GameModeFortnite(trolling, this));
+        this.gameModes.add(new GameModeCasual(trolling, this));
+        this.gameModes.add(new GameModeChallenge(trolling, this));
+        this.gameModes.add(new GameModeCreative(trolling, this));
         loadStatus();
     }
 

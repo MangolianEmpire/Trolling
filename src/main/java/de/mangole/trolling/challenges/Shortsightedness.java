@@ -1,11 +1,11 @@
 package de.mangole.trolling.challenges;
 
 import de.mangole.trolling.Trolling;
+import de.mangole.trolling.utils.ChallengeEvent;
 import de.mangole.trolling.utils.CustomChallenge;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
@@ -36,13 +36,13 @@ public class Shortsightedness extends CustomChallenge {
         }
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onDrinkMilk(PlayerItemConsumeEvent event) {
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
