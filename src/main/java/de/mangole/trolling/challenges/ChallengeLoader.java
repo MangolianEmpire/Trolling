@@ -75,6 +75,9 @@ public class ChallengeLoader {
         LandMines landMines = new LandMines(trolling);
         challenges.add(landMines);
 
+        NoOneLeftBehind noOneLeftBehind = new NoOneLeftBehind(trolling);
+        challenges.add(noOneLeftBehind);
+
         // active saved challenges
         for (CustomChallenge challenge : challenges) {
             boolean active = config.getBoolean("challenges." + challenge.getChallengeName(), false);
@@ -175,6 +178,14 @@ public class ChallengeLoader {
                 Component.text("LandMines", NamedTextColor.DARK_RED),
                 Component.text("Watch your steps", NamedTextColor.DARK_RED),
                 landMines
+        ));
+
+        //NoOneLeftBehind
+        customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
+                Material.HEART_POTTERY_SHERD,
+                Component.text("No One Left Behind", NamedTextColor.LIGHT_PURPLE),
+                Component.text("Real friends are always by your side", NamedTextColor.LIGHT_PURPLE),
+                noOneLeftBehind
         ));
     }
 
