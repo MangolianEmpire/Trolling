@@ -1,7 +1,8 @@
 package de.mangole.trolling.events;
 
-import de.mangole.trolling.*;
-import de.mangole.trolling.utils.CustomChallenge;
+import de.mangole.trolling.GameManager;
+import de.mangole.trolling.GameStatus;
+import de.mangole.trolling.Trolling;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -16,6 +17,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
@@ -27,6 +29,7 @@ public class LobbyListener implements Listener {
     private final Trolling trolling;
     private boolean isCountdown = false;
     private final GameManager gameManager;
+    private long period = 20;
 
     public LobbyListener(final Trolling trolling) {
         this.trolling = trolling;
@@ -42,7 +45,7 @@ public class LobbyListener implements Listener {
     }
 
     @EventHandler
-    public void onBreakBlock(BlockPlaceEvent event) {
+    public void onPlaceBlock(BlockPlaceEvent event) {
         World world = event.getBlock().getWorld();
         if (world.getName().equalsIgnoreCase("ChallengesLobby_world")) {
             event.setCancelled(true);
@@ -74,7 +77,7 @@ public class LobbyListener implements Listener {
     }
 
     @EventHandler
-    public void onSpawn(FoodLevelChangeEvent event) {
+    public void onFood(FoodLevelChangeEvent event) {
         World world = event.getEntity().getWorld();
         if (world.getName().equalsIgnoreCase("ChallengesLobby_world")) {
             event.setCancelled(true);
@@ -84,6 +87,14 @@ public class LobbyListener implements Listener {
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
         World world = event.getPlayer().getWorld();
+        if (world.getName().equalsIgnoreCase("ChallengesLobby_world")) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        World world = event.getWhoClicked().getWorld();
         if (world.getName().equalsIgnoreCase("ChallengesLobby_world")) {
             event.setCancelled(true);
         }
@@ -114,12 +125,6 @@ public class LobbyListener implements Listener {
 
     private void countdown() {
         isCountdown = true;
-        long period = 20;
-        for (CustomChallenge challenge : trolling.getChallengeLoader().getCustomChallenges()) {
-            if (challenge.getChallengeName().equals("FasterMinecraft") && challenge.isActive()) {
-                period = 100;
-            }
-        }
 
         new BukkitRunnable() {
             int start_counter = 5;
@@ -157,5 +162,9 @@ public class LobbyListener implements Listener {
             }
         }
         return true;
+    }
+
+    public void setPeriod(long period) {
+        this.period = period;
     }
 }

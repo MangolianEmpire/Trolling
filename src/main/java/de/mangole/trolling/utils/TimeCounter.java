@@ -1,8 +1,6 @@
 package de.mangole.trolling.utils;
 
-import de.mangole.trolling.GameManager;
 import de.mangole.trolling.Trolling;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -13,6 +11,7 @@ import org.bukkit.scoreboard.*;
 public class TimeCounter {
 
     private long seconds = 0;
+    private long period = 20;
     private BukkitTask counter;
     private final Trolling trolling;
     private boolean paused = false;
@@ -34,12 +33,6 @@ public class TimeCounter {
 
     public void start() {
         paused = false;
-        long period = 20;
-        for (CustomChallenge challenge : trolling.getChallengeLoader().getCustomChallenges()) {
-            if (challenge.getChallengeName().equals("FasterMinecraft") && challenge.isActive()) {
-                period = 100;
-            }
-        }
 
         if (counter != null) {
             counter.cancel();
@@ -55,7 +48,26 @@ public class TimeCounter {
                     updateScoreboard(seconds);
                 }
             }
-        }.runTaskTimer(trolling, 0L, period);
+        }.runTaskTimer(trolling, 0L, this.period);
+    }
+
+    public void updateCounterPeriod() {
+        if (counter != null) {
+            counter.cancel();
+            counter = null;
+        }
+
+        updateScoreboard(seconds);
+
+        counter = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!paused) {
+                    seconds++;
+                    updateScoreboard(seconds);
+                }
+            }
+        }.runTaskTimer(trolling, 0L, this.period);
     }
 
     public void pause() {
@@ -103,6 +115,13 @@ public class TimeCounter {
 
     public void setSeconds (long seconds) {
         this.seconds = seconds;
+    }
+
+    public void setPeriod (long period) {
+        this.period = period;
+        if (counter != null) {
+            updateCounterPeriod();
+        }
     }
 }
 

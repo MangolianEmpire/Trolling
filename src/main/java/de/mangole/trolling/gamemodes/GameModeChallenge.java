@@ -9,8 +9,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 public class GameModeChallenge extends GameModeBase {
 
-    public GameModeChallenge(Trolling trolling) {
-        super(trolling, GameMode.CHALLENGE);
+    public GameModeChallenge(Trolling trolling, GameManager gameManager) {
+        super(trolling, gameManager, GameMode.CHALLENGE);
     }
 
     @GameModeEvent

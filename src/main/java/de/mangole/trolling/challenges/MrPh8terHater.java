@@ -1,6 +1,7 @@
 package de.mangole.trolling.challenges;
 
 import de.mangole.trolling.Trolling;
+import de.mangole.trolling.utils.ChallengeEvent;
 import de.mangole.trolling.utils.CustomChallenge;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -8,7 +9,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -41,7 +41,7 @@ public class MrPh8terHater extends CustomChallenge {
     }
 
     // Takes more damage
-    @EventHandler
+    @ChallengeEvent
     public void onEntitydamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player player) {
             if (player.getName().equals(VICTIM_NAME)) {
@@ -52,14 +52,14 @@ public class MrPh8terHater extends CustomChallenge {
     }
 
     // Degrades tools faster when breaking blocks
-    @EventHandler
+    @ChallengeEvent
     public void onPlayerUseTool(BlockBreakEvent event) {
         if (new Random().nextDouble() > 0.3) return;
         degradeToolInHand(event.getPlayer());
     }
 
     // Deals less damage and degrade weapons faster
-    @EventHandler
+    @ChallengeEvent
     public void onEntitydamage(EntityDamageByEntityEvent event) {
         if (new Random().nextDouble() > 0.3) return;
         if (event.getDamager() instanceof Player damager) {
@@ -91,7 +91,7 @@ public class MrPh8terHater extends CustomChallenge {
                     || material.toString().endsWith("_SHEARS");
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onLightningStrike(LightningStrikeEvent event) {
         if (event.getLightning().hasMetadata("customStrike")) return; // ignore custom strikes
 
@@ -104,7 +104,7 @@ public class MrPh8terHater extends CustomChallenge {
         }
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onRegen(EntityRegainHealthEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
         if (player.getName().equalsIgnoreCase(VICTIM_NAME)) {
@@ -112,7 +112,7 @@ public class MrPh8terHater extends CustomChallenge {
         }
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onHunger(FoodLevelChangeEvent event){
         if (new Random().nextDouble() > 0.2) return;
         if (!(event.getEntity() instanceof Player player)) return;

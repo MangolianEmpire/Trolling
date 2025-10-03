@@ -1,11 +1,11 @@
 package de.mangole.trolling.challenges;
 
 import de.mangole.trolling.Trolling;
+import de.mangole.trolling.utils.ChallengeEvent;
 import de.mangole.trolling.utils.CustomChallenge;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.event.EventHandler;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.Objects;
@@ -39,7 +39,7 @@ public class Heartbroken extends CustomChallenge {
         player.setHealth(health);
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onJoin(PlayerJoinEvent event) {
         setPlayerMaxHealth(event.getPlayer(), 1);
     }

@@ -1,9 +1,9 @@
 package de.mangole.trolling.challenges;
 
 import de.mangole.trolling.Trolling;
+import de.mangole.trolling.utils.ChallengeEvent;
 import de.mangole.trolling.utils.CustomChallenge;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class FasterMincraft extends CustomChallenge {
@@ -19,6 +19,8 @@ public class FasterMincraft extends CustomChallenge {
             player.setNoDamageTicks(2);
             player.setMaximumNoDamageTicks(2);
         });
+        trolling.getTimerManager().getTimerCounter().setPeriod(100);
+        trolling.getLobbyListener().setPeriod(100);
     }
 
     @Override
@@ -28,9 +30,11 @@ public class FasterMincraft extends CustomChallenge {
             player.setNoDamageTicks(10);
             player.setMaximumNoDamageTicks(10);
         });
+        trolling.getTimerManager().getTimerCounter().setPeriod(20);
+        trolling.getLobbyListener().setPeriod(20);
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
         p.setNoDamageTicks(2);

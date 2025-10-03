@@ -7,21 +7,29 @@ import de.mangole.trolling.commands.ChallengeEdit;
 import de.mangole.trolling.commands.GameChange;
 import de.mangole.trolling.commands.WorldCommand;
 import de.mangole.trolling.commands.WorldReset;
-import de.mangole.trolling.events.*;
+import de.mangole.trolling.events.GameChangeListener;
+import de.mangole.trolling.events.GameLogicListener;
+import de.mangole.trolling.events.GamePortalListener;
+import de.mangole.trolling.events.LobbyListener;
 import de.mangole.trolling.utils.CustomInventoryListener;
-import de.mangole.trolling.utils.TimeCounter;
+import de.mangole.trolling.utils.ReviveBeaconManager;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class Trolling extends JavaPlugin {
+public class Trolling extends JavaPlugin implements Listener {
 
     private GameManager gameManager;
     private Data data;
     private WorldManager worldManager;
     private ChallengeLoader challengeLoader;
     private TimerManager timerManager;
+    private ReviveBeaconManager reviveBeaconManager;
     private ProtocolManager protocolManager;
+    private LobbyListener lobbyListener;
     public static Plugin plugin;
 
     @Override
@@ -32,16 +40,21 @@ public class Trolling extends JavaPlugin {
     public void onEnable() {
         getLogger().info("Mein Plugin wurde geladen!");
 
-        this.worldManager = new WorldManager(this);
         this.gameManager = new GameManager(this);
-        this.challengeLoader = new ChallengeLoader(this);
-        this.data = new Data(this);
         this.timerManager = new TimerManager(this);
-        this.protocolManager = ProtocolLibrary.getProtocolManager();
 
         registerEvents();
         registerCommands();
         plugin = this;
+    }
+
+    @EventHandler
+    public void onServerLoad(ServerLoadEvent event) {
+        this.challengeLoader = new ChallengeLoader(this);
+        this.worldManager = new WorldManager(this);
+        this.data = new Data(this);
+        this.protocolManager = ProtocolLibrary.getProtocolManager();
+        this.reviveBeaconManager = new ReviveBeaconManager(this);
 
         if (gameManager.getGameStatus() == GameStatus.LOST) {
             gameManager.stopGame();
@@ -63,11 +76,16 @@ public class Trolling extends JavaPlugin {
         if (this.timerManager != null) {
             timerManager.saveTimer();
         }
+
+        if (this.reviveBeaconManager != null) {
+            reviveBeaconManager.saveBeacons();
+        }
     }
 
     private void registerEvents() {
         PluginManager pluginManager = getServer().getPluginManager();
-        pluginManager.registerEvents(new LobbyListener(this), this);
+        pluginManager.registerEvents(this, this);
+        pluginManager.registerEvents(lobbyListener = new LobbyListener(this), this);
         pluginManager.registerEvents(new CustomInventoryListener(this), this);
         pluginManager.registerEvents(new GamePortalListener(this), this);
         pluginManager.registerEvents(new GameChangeListener(this), this);
@@ -99,6 +117,10 @@ public class Trolling extends JavaPlugin {
 
     public ProtocolManager getProtocolManager() {
         return protocolManager;
+    }
+
+    public LobbyListener getLobbyListener() {
+        return lobbyListener;
     }
 }
 
