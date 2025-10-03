@@ -1,6 +1,7 @@
 package de.mangole.trolling.challenges;
 
 import de.mangole.trolling.Trolling;
+import de.mangole.trolling.utils.ChallengeEvent;
 import de.mangole.trolling.utils.CustomChallenge;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -8,7 +9,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class ChorusInfection extends CustomChallenge {
     protected void onDeactivate() {
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onConsume(PlayerItemConsumeEvent event) {
         Player player = event.getPlayer();
         if (event.getItem().getType().equals(Material.CHORUS_FRUIT)) return;

@@ -1,12 +1,11 @@
 package de.mangole.trolling.challenges;
 
 import de.mangole.trolling.Trolling;
+import de.mangole.trolling.utils.ChallengeEvent;
 import de.mangole.trolling.utils.CustomChallenge;
 import org.bukkit.*;
-import org.bukkit.entity.Player;
 import org.bukkit.block.Block;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.util.*;
@@ -40,7 +39,7 @@ public class LandMines extends CustomChallenge {
     protected void onDeactivate() {
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         if (player.getGameMode() != GameMode.SURVIVAL) {

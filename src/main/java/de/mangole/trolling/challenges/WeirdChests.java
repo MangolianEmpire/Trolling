@@ -1,6 +1,7 @@
 package de.mangole.trolling.challenges;
 
 import de.mangole.trolling.Trolling;
+import de.mangole.trolling.utils.ChallengeEvent;
 import de.mangole.trolling.utils.ContainerUtils;
 import de.mangole.trolling.utils.CustomChallenge;
 import net.kyori.adventure.text.Component;
@@ -13,7 +14,6 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -37,7 +37,7 @@ public class WeirdChests extends CustomChallenge {
     protected void onDeactivate() {
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onChestOpen(PlayerInteractEvent event) {
         if (!isActive()) return;
         if (event.getClickedBlock() == null) return;
@@ -73,7 +73,7 @@ public class WeirdChests extends CustomChallenge {
         }
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onBarrelOpen(InventoryOpenEvent event) {
         Random random = new Random();
         if (random.nextDouble() > 0.05) return;

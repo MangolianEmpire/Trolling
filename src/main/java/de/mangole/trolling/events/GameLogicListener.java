@@ -50,20 +50,21 @@ public class GameLogicListener implements Listener {
         trolling.getTimerManager().getTimerCounter().addPlayer(player);
         if (gameManager.getGameStatus() == GameStatus.LOBBY) {
             PlayerInitUtils.initPlayerLobby(player);
-        } else if (player.getLocation().getWorld().equals(WorldManager.lobbyWorld)) {
-            if (gameManager.getGameMode() == GameMode.FORTNITE) {
-                PlayerInitUtils.initPlayerFortnite(player);
-            } else {
-                PlayerInitUtils.initPlayerGame(player);
+        } else {
+            String spawnWorld = player.getLocation().getWorld().getName();
+            if (!spawnWorld.equals("game_overworld") && !spawnWorld.equals("game_nether") && !spawnWorld.equals("game_end")) {
+                if (gameManager.getGameMode() == GameMode.FORTNITE) {
+                    PlayerInitUtils.initPlayerFortnite(player);
+                } else if (gameManager.getGameMode() == GameMode.CREATIVE) {
+                    PlayerInitUtils.initPlayerCreative(player);
+                } else {
+                    PlayerInitUtils.initPlayerGame(player);
+                }
             }
         }
 
         if (gameManager.getGameStatus() == GameStatus.LOST) {
             player.setGameMode(org.bukkit.GameMode.SPECTATOR);
-        } else if (gameManager.getGameMode() == GameMode.CREATIVE) {
-            player.setGameMode(org.bukkit.GameMode.CREATIVE);
-        } else {
-            player.setGameMode(org.bukkit.GameMode.SURVIVAL);
         }
     }
 

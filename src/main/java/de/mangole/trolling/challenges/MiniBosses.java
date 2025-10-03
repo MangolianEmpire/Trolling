@@ -1,6 +1,7 @@
 package de.mangole.trolling.challenges;
 
 import de.mangole.trolling.Trolling;
+import de.mangole.trolling.utils.ChallengeEvent;
 import de.mangole.trolling.utils.CustomChallenge;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -8,7 +9,6 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -48,7 +48,7 @@ public class MiniBosses extends CustomChallenge {
 
     boolean isSpawningBoss = false;
 
-    @EventHandler
+    @ChallengeEvent
     public void onEntitiySpawn(EntitySpawnEvent event) {
         if (isSpawningBoss) {
             return;
@@ -92,7 +92,7 @@ public class MiniBosses extends CustomChallenge {
         bossSlime.setAI(true);
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onBossSlimeHit(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Slime slime)) return;
         if (!slime.hasMetadata("isBoss")) return;
@@ -109,7 +109,7 @@ public class MiniBosses extends CustomChallenge {
         miniSlime.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, Integer.MAX_VALUE, 3));
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onBossSlimeSplit(SlimeSplitEvent event) {
         Slime slime = event.getEntity();
         if (slime.hasMetadata("isBoss") || slime.hasMetadata("isMinion")) {
@@ -117,7 +117,7 @@ public class MiniBosses extends CustomChallenge {
         }
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onBossSlimeDeath(EntityDeathEvent event) {
         if (!(event.getEntity() instanceof Slime slime)) return;
         if (slime.hasMetadata("isBoss")) {
@@ -135,7 +135,7 @@ public class MiniBosses extends CustomChallenge {
         }
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onPlayerJumpWhileSneaking(PlayerToggleSneakEvent event) {
         var player = event.getPlayer();
 
@@ -181,7 +181,7 @@ public class MiniBosses extends CustomChallenge {
         startParticles(bossBlaze);
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onBossBlazeDeath(EntityDeathEvent event) {
         if (!(event.getEntity() instanceof Blaze blaze)) return;
         if (blaze.hasMetadata("isBoss")) {
@@ -247,7 +247,7 @@ public class MiniBosses extends CustomChallenge {
         }.runTaskTimer(trolling, 0L, 10L); // Every 0.5 seconds
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onProjectileHit(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Blaze blaze)) return;
         if (!blaze.hasMetadata("isBoss")) return;
@@ -259,7 +259,7 @@ public class MiniBosses extends CustomChallenge {
         }
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onPlayerUseFireBreath(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 

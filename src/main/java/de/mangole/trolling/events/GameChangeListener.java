@@ -10,6 +10,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 public class GameChangeListener implements Listener {
@@ -38,6 +39,8 @@ public class GameChangeListener implements Listener {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (gameManager.getGameMode() == de.mangole.trolling.GameMode.FORTNITE) {
                     PlayerInitUtils.initPlayerFortnite(player);
+                } else if (gameManager.getGameMode() == de.mangole.trolling.GameMode.CREATIVE) {
+                    PlayerInitUtils.initPlayerCreative(player);
                 } else {
                     PlayerInitUtils.initPlayerGame(player);
                 }
@@ -58,8 +61,13 @@ public class GameChangeListener implements Listener {
         }
 
         if (newStatus == GameStatus.PAUSED) {
-            trolling.getServer().getServerTickManager().setFrozen(true);
-            setTitlePaused(true);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    trolling.getServer().getServerTickManager().setFrozen(true);
+                    setTitlePaused(true);
+                }
+            }.runTaskLater(trolling, 1L);
         }
         if (newStatus != GameStatus.PAUSED) {
             trolling.getServer().getServerTickManager().setFrozen(false);

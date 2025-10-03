@@ -67,6 +67,26 @@ public class PlayerInitUtils {
         }
     }
 
+    public static void initPlayerCreative(Player player) {
+        World gameOverWorld = Bukkit.getWorld("game_overworld");
+        player.getInventory().clear();
+        player.teleport(gameOverWorld.getSpawnLocation());
+        player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1F);
+        player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.MAX_HEALTH)).getBaseValue());
+        player.setFoodLevel(20);
+        player.setExperienceLevelAndProgress(0);
+        player.setInvisible(false);
+        player.setCollidable(true);
+        player.setAllowFlight(true);
+        for (@NotNull Iterator<Advancement> it = Bukkit.advancementIterator(); it.hasNext(); ) {
+            Advancement adv = it.next();
+            AdvancementProgress progress = player.getAdvancementProgress(adv);
+            for (String criteria : progress.getAwardedCriteria()) {
+                progress.revokeCriteria(criteria);
+            }
+        }
+    }
+
     public static void initPlayerFortnite(Player player) {
         World gameOverWorld = Bukkit.getWorld("game_overworld");
         player.getInventory().clear();
