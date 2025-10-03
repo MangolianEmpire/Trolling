@@ -7,10 +7,8 @@ import de.mangole.trolling.utils.ChallengeEvent;
 import de.mangole.trolling.utils.CustomChallenge;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
@@ -58,9 +56,9 @@ public class NoOneLeftBehind extends CustomChallenge {
                 }
                 for(Player player : trolling.getServer().getOnlinePlayers()){
                     List<Entity> nearbyEntities = player.getNearbyEntities(20, 20,20);
+                    if (player.getGameMode() != GameMode.SURVIVAL) continue;
                     if (hasNearbyPlayers(nearbyEntities)) continue;
                     trolling.getServer().sendMessage(Component.text(player.getName() + ": " + FUNNY_TEXTS[new Random().nextInt(0, FUNNY_TEXTS.length - 1)]));
-                    player.sendRawMessage(FUNNY_TEXTS[new Random().nextInt(0, FUNNY_TEXTS.length - 1)]);
                     player.damage(2);
                 }
             }
