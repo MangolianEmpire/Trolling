@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -23,7 +24,7 @@ import org.bukkit.scheduler.BukkitTask;
 public class ReviveBeacon implements Listener {
 
     private final Trolling trolling;
-    private final Player revivePlayer;
+    private Player revivePlayer;
     private final double reviveRange;
     private int reviveProgress = 0;
     private final int reviveDuration;
@@ -45,6 +46,7 @@ public class ReviveBeacon implements Listener {
 
         oldBlock = block.getType();
         block.setType(Material.BEACON);
+
         foundation = new Block[9];
         foundationMats = new Material[9];
         int i = 0;
@@ -52,27 +54,18 @@ public class ReviveBeacon implements Listener {
             for (int z = block.getZ() - 1; z <= block.getZ() + 1; z++) {
                 Block foundationBlock = block.getWorld().getBlockAt(x, block.getY() - 1, z);
                 foundation[i] = foundationBlock;
-                Material oldMat = foundationBlock.getType();
-                foundationMats[i] = oldMat;
+                foundationMats[i] = foundationBlock.getType();
                 foundationBlock.setType(Material.IRON_BLOCK);
                 i++;
             }
         }
 
-        reviveTask = reviveTask();
+        reviveTask = startReviveTask();
     }
 
-
-    private BukkitTask reviveTask() {
-        long period = 1;
-        for (CustomChallenge challenge : trolling.getChallengeLoader().getCustomChallenges()) {
-            if (challenge.getChallengeName().equals("FasterMinecraft") && challenge.isActive()) {
-                period = 5;
-                break;
-            }
-        }
-
+    private BukkitTask startReviveTask() {
         Location loc = block.getLocation().clone().add(0.0, 1, 0.0);
+
         if (progressDisplay == null || progressDisplay.isDead()) {
             progressDisplay = block.getWorld().spawn(loc, TextDisplay.class, textDisplay -> {
                 textDisplay.setBillboard(Display.Billboard.VERTICAL);
@@ -85,7 +78,6 @@ public class ReviveBeacon implements Listener {
 
             @Override
             public void run() {
-
                 updateReviveProgressText();
 
                 if (counter % 5 == 0) showReviveParticle();
@@ -96,36 +88,33 @@ public class ReviveBeacon implements Listener {
                     return;
                 }
 
-                int playerInRange = getPlayersInRange();
-                if (playerInRange > 0 && counter % 10 == 0) {
+                int playersInRange = getPlayersInRange();
+                if (playersInRange > 0 && counter % 10 == 0) {
                     loc.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_BIT, 1f, 1f);
                 }
-                reviveProgress += playerInRange;
+                if (revivePlayer.isOnline())
+                    reviveProgress += playersInRange;
                 counter++;
             }
-        }.runTaskTimer(trolling, 0, period);
+        }.runTaskTimer(trolling, 0, 1L);
     }
 
     private int getPlayersInRange() {
-        int numberPlayers = 0;
+        int count = 0;
         World world = block.getWorld();
-        Location location = block.getLocation();
+        Location loc = block.getLocation();
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getWorld().equals(world) && !player.equals(revivePlayer) && player.getGameMode().equals(GameMode.SURVIVAL)) {
-                if (player.getLocation().distance(location) < reviveRange) {
-                    numberPlayers++;
-                }
+            if (!player.equals(revivePlayer) && player.getGameMode() == GameMode.SURVIVAL && player.getWorld().equals(world)) {
+                if (player.getLocation().distance(loc) < reviveRange) count++;
             }
         }
-        return numberPlayers;
+        return count;
     }
 
     private void updateReviveProgressText() {
-        double percentProgress = (double) reviveProgress / reviveDuration;
+        double percent = (double) reviveProgress / reviveDuration;
         if (progressDisplay != null) {
-            progressDisplay.text(Component.text(
-                    String.format("%.0f%%", percentProgress * 100), NamedTextColor.YELLOW
-            ));
+            progressDisplay.text(Component.text(String.format("%.0f%%", percent * 100), NamedTextColor.YELLOW));
         }
     }
 
@@ -149,80 +138,65 @@ public class ReviveBeacon implements Listener {
         revivePlayer.clearActivePotionEffects();
         revivePlayer.getInventory().clear();
         revivePlayer.setGameMode(GameMode.SURVIVAL);
-        World world = block.getWorld();
-        world.playSound(block.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
+        block.getWorld().playSound(block.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
         Bukkit.getPluginManager().callEvent(new PlayerRespawnEvent(revivePlayer, block.getLocation(), false, false, false, PlayerRespawnEvent.RespawnReason.PLUGIN));
     }
 
     public void cleanup() {
         block.setType(oldBlock);
-        for (int i = 0; i < foundationMats.length; i++) {
+        for (int i = 0; i < foundation.length; i++) {
             foundation[i].setType(foundationMats[i]);
         }
-        progressDisplay.remove();
 
+        if (progressDisplay != null) progressDisplay.remove();
         HandlerList.unregisterAll(this);
 
-        if (reviveTask != null && !reviveTask.isCancelled()) {
-            reviveTask.cancel();
-        }
+        if (reviveTask != null && !reviveTask.isCancelled()) reviveTask.cancel();
 
         GameModeFortnite.reviveBeacons.remove(this);
-
         revivePlayer();
     }
 
-    public Player getRevivePlayer() {
-        return revivePlayer;
+    public void setRevivePlayer(Player revivePlayer) {
+        this.revivePlayer = revivePlayer;
     }
 
-    public Location getReviveLocation() {
-        return block.getLocation();
-    }
+    public Player getRevivePlayer() { return revivePlayer; }
 
+    public Location getReviveLocation() { return block.getLocation(); }
 
     @EventHandler
-    public void onBreak(BlockBreakEvent event) {
+    public void onEntityExplode(EntityExplodeEvent event) {
+        event.blockList().remove(block);
+        for (Block b : foundation) event.blockList().remove(b);
+    }
+
+    @EventHandler
+    public void onBlockExplode(BlockExplodeEvent event) {
+        event.blockList().remove(block);
+        for (Block b : foundation) event.blockList().remove(b);
+    }
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Block block = event.getBlock();
+        if (block.equals(this.block)) event.setCancelled(true);
+        for (Block b : foundation)
+            if (b.equals(block)) event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onBlockBurn(BlockBurnEvent event) {
         if (event.getBlock().equals(block)) event.setCancelled(true);
-
-        for (Block value : foundation) {
-            if (event.getBlock().equals(value)) {
-                event.setCancelled(true);
-            }
-        }
+        for (Block b : foundation) if (event.getBlock().equals(b)) event.setCancelled(true);
     }
 
     @EventHandler
-    public void onExplode(BlockExplodeEvent event) {
-        if (event.getBlock().equals(block)) event.setCancelled(true);
-
-        for (Block value : foundation) {
-            if (event.getBlock().equals(value)) {
-                event.setCancelled(true);
-            }
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getClickedBlock() != null) {
+            if (event.getClickedBlock().equals(block)) event.setCancelled(true);
+            for (Block b : foundation) if (event.getClickedBlock().equals(b)) event.setCancelled(true);
         }
     }
 
-    @EventHandler
-    public void onBurn(BlockBurnEvent event) {
-        if (event.getBlock().equals(block)) event.setCancelled(true);
-
-        for (Block value : foundation) {
-            if (event.getBlock().equals(value)) {
-                event.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onInteract(PlayerInteractEvent event) {
-        if (event.getClickedBlock() == null) return;
-        if (event.getClickedBlock().equals(block)) event.setCancelled(true);
-
-        for (Block value : foundation) {
-            if (event.getClickedBlock().equals(value)) {
-                event.setCancelled(true);
-            }
-        }
-    }
 }

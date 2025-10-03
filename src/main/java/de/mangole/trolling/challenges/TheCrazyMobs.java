@@ -33,6 +33,11 @@ public class TheCrazyMobs extends CustomChallenge {
 
     @Override
     protected void onActivate() {
+        if (batTask != null) {
+            batTask.cancel();
+            batTask = null;
+        }
+        activeBats.clear();
         batTask = startBatTracking();
     }
 

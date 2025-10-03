@@ -14,16 +14,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FortniteSpectator {
 
     private final Trolling trolling;
     private final ItemStack spectatingCompass;
-    private List<Player> spectators = new ArrayList<>();
+    private Set<Player> spectators = new HashSet<>();
     private Map<Player, Player> spectatorTargets = new HashMap<>();
 
     public FortniteSpectator(Trolling trolling) {
@@ -48,7 +45,7 @@ public class FortniteSpectator {
     public void resetFortniteSpectator(Player player) {
         player.clearActivePotionEffects();
         player.getInventory().clear();
-        player.setHealth(20);
+        player.setHealth(player.getMaxHealth());
         player.setGameMode(GameMode.SURVIVAL);
         player.setInvisible(false);
         player.setAllowFlight(false);
@@ -104,7 +101,7 @@ public class FortniteSpectator {
     }
 
 
-    public List<Player> getSpectators() {
+    public Set<Player> getSpectators() {
         return spectators;
     }
 

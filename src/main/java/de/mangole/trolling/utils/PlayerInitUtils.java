@@ -33,6 +33,7 @@ public class PlayerInitUtils {
         player.setInvisible(false);
         player.setCollidable(true);
         player.setAllowFlight(false);
+        player.setGameMode(GameMode.SURVIVAL);
         player.teleport(WorldManager.lobbySpawn);
         player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1F);
         player.clearActivePotionEffects();

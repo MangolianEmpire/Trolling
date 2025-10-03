@@ -3,7 +3,9 @@ package de.mangole.trolling.events;
 import de.mangole.trolling.GameManager;
 import de.mangole.trolling.GameStatus;
 import de.mangole.trolling.Trolling;
+import de.mangole.trolling.gamemodes.GameModeFortnite;
 import de.mangole.trolling.utils.PlayerInitUtils;
+import de.mangole.trolling.utils.ReviveBeacon;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
@@ -49,13 +51,13 @@ public class GameChangeListener implements Listener {
         }
 
         if (newStatus == GameStatus.LOBBY) {
-            trolling.getServer().getScheduler().cancelTasks(trolling);
+            for (ReviveBeacon reviveBeacon : GameModeFortnite.reviveBeacons) {
+                reviveBeacon.cleanup();
+            }
             Bukkit.getOnlinePlayers().forEach(player -> {
                 PlayerInitUtils.initPlayerLobby(player);
                 if (gameManager.getGameMode() == de.mangole.trolling.GameMode.CREATIVE) {
                     player.setGameMode(GameMode.CREATIVE);
-                } else {
-                    player.setGameMode(GameMode.SURVIVAL);
                 }
             });
         }

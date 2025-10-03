@@ -12,6 +12,7 @@ import de.mangole.trolling.events.GameLogicListener;
 import de.mangole.trolling.events.GamePortalListener;
 import de.mangole.trolling.events.LobbyListener;
 import de.mangole.trolling.utils.CustomInventoryListener;
+import de.mangole.trolling.utils.ReviveBeaconManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerLoadEvent;
@@ -26,6 +27,7 @@ public class Trolling extends JavaPlugin implements Listener {
     private WorldManager worldManager;
     private ChallengeLoader challengeLoader;
     private TimerManager timerManager;
+    private ReviveBeaconManager reviveBeaconManager;
     private ProtocolManager protocolManager;
     private LobbyListener lobbyListener;
     public static Plugin plugin;
@@ -52,6 +54,7 @@ public class Trolling extends JavaPlugin implements Listener {
         this.worldManager = new WorldManager(this);
         this.data = new Data(this);
         this.protocolManager = ProtocolLibrary.getProtocolManager();
+        this.reviveBeaconManager = new ReviveBeaconManager(this);
 
         if (gameManager.getGameStatus() == GameStatus.LOST) {
             gameManager.stopGame();
@@ -72,6 +75,10 @@ public class Trolling extends JavaPlugin implements Listener {
 
         if (this.timerManager != null) {
             timerManager.saveTimer();
+        }
+
+        if (this.reviveBeaconManager != null) {
+            reviveBeaconManager.saveBeacons();
         }
     }
 

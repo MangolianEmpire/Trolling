@@ -22,15 +22,10 @@ public class GameLogicListener implements Listener {
 
     private final Trolling trolling;
     private final GameManager gameManager;
-    private ArrayList<GameModeBase> gameModes = new ArrayList<>();
 
     public GameLogicListener(Trolling trolling) {
         this.trolling = trolling;
         this.gameManager = trolling.getGameManager();
-        this.gameModes.add(new GameModeFortnite(trolling));
-        this.gameModes.add(new GameModeCasual(trolling));
-        this.gameModes.add(new GameModeChallenge(trolling));
-        this.gameModes.add(new GameModeCreative(trolling));
     }
 
     @EventHandler

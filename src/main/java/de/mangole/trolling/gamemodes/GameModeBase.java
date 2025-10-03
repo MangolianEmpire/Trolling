@@ -18,10 +18,10 @@ public abstract class GameModeBase implements Listener {
     protected final GameMode gameMode;
     protected final GameManager gameManager;
 
-    public GameModeBase(Trolling trolling, GameMode gameMode) {
+    public GameModeBase(Trolling trolling, GameManager gameManager, GameMode gameMode) {
         this.trolling = trolling;
         this.gameMode = gameMode;
-        this.gameManager =trolling.getGameManager();
+        this.gameManager = gameManager;
 
         registerAnnotatedEvents(trolling);
     }
