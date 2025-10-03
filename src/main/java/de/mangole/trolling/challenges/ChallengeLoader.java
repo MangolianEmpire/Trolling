@@ -72,6 +72,9 @@ public class ChallengeLoader {
         mrPh8terHater.activate();
         challenges.add(mrPh8terHater);
 
+        LandMines landMines = new LandMines(trolling);
+        challenges.add(landMines);
+
         // active saved challenges
         for (CustomChallenge challenge : challenges) {
             boolean active = config.getBoolean("challenges." + challenge.getChallengeName(), false);
@@ -164,6 +167,14 @@ public class ChallengeLoader {
                 Component.text("Heartbroken", NamedTextColor.RED),
                 Component.text("Why did she leave me :(", NamedTextColor.RED),
                 heartbroken
+        ));
+
+        // LandMines
+        customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
+                Material.TNT,
+                Component.text("LandMines", NamedTextColor.DARK_RED),
+                Component.text("Watch your steps", NamedTextColor.DARK_RED),
+                landMines
         ));
     }
 

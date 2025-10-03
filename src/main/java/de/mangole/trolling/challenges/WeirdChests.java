@@ -76,7 +76,7 @@ public class WeirdChests extends CustomChallenge {
     @EventHandler
     public void onBarrelOpen(InventoryOpenEvent event) {
         Random random = new Random();
-        if (random.nextDouble() > 0.1) return;
+        if (random.nextDouble() > 0.05) return;
         Inventory inv = event.getInventory();
         if (inv.getLocation() != null) {
             var block = inv.getLocation().getBlock();

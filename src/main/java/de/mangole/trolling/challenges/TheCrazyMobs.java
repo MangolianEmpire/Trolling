@@ -11,11 +11,16 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
 
 public class TheCrazyMobs extends CustomChallenge {
+
+    private BukkitTask batTask = null;
 
     public TheCrazyMobs(Trolling trolling) {
         super(trolling, "TheCrazyMobs");
@@ -23,10 +28,13 @@ public class TheCrazyMobs extends CustomChallenge {
 
     @Override
     protected void onActivate() {
+        batTask = startBatTracking();
     }
 
     @Override
     protected void onDeactivate() {
+        batTask.cancel();
+        batTask = null;
     }
 
     @EventHandler
@@ -216,6 +224,89 @@ public class TheCrazyMobs extends CustomChallenge {
 
     }
 
+    private @NotNull BukkitTask startBatTracking() {
+        return new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.getGameMode() != GameMode.SURVIVAL) continue;
+                    Location loc = player.getLocation();
+                    for (Bat bat : loc.getWorld().getNearbyEntitiesByType(Bat.class, loc, 32.0)) { // Nur Bats in 32 Blöcken um Spieler checken.
+                        Player target = getNearestVisiblePlayer(bat);
+                        if (target != null && !bat.getScoreboardTags().contains("tracking")) {
+                            bat.addScoreboardTag("tracking");
+                            bat.addScoreboardTag("target_" + target.getUniqueId());
+                            bat.setGravity(false);
+                        }
+                        if (bat.getScoreboardTags().contains("tracking")) {
+                            for (String tag : bat.getScoreboardTags()) {
+                                if (tag.startsWith("target_")) {
+                                    Player tracked = Bukkit.getPlayer(java.util.UUID.fromString(tag.replace("target_", "")));
+                                    if (tracked != null && tracked.isOnline()) {
+                                        updateBatBehavior(bat, tracked);
+                                    } else {
+                                        bat.removeScoreboardTag("tracking");
+                                        bat.removeScoreboardTag(tag);
+                                        bat.setGravity(true);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }.runTaskTimer(trolling, 0L, 10L);
+    }
+
+    private Player getNearestVisiblePlayer(Bat bat) {
+        double closestDist = Double.MAX_VALUE;
+        Player nearest = null;
+        for (Player player : bat.getWorld().getPlayers()) {
+            if (player.getGameMode() == GameMode.SURVIVAL && bat.hasLineOfSight(player)) {
+                double dist = player.getLocation().distanceSquared(bat.getLocation());
+                if (dist < closestDist && dist <= 256) {
+                    closestDist = dist;
+                    nearest = player;
+                }
+            }
+        }
+        return nearest;
+    }
+
+    private void updateBatBehavior(Bat bat, Player target) {
+        Location batLoc = bat.getLocation();
+        Location targetLoc = target.getLocation();
+        double distance = batLoc.distance(targetLoc);
+
+        bat.setTarget(target);
+
+        if (distance <= 4.0) {
+            explodeBat(bat);
+            return;
+        }
+
+        if (distance <= 10.0) {
+            Vector direction = targetLoc.toVector().subtract(batLoc.toVector()).normalize();
+            bat.setVelocity(direction.multiply(4.0));
+        } else {
+            Vector direction = targetLoc.toVector().subtract(batLoc.toVector()).normalize();
+            bat.setVelocity(direction.multiply(1.5));
+        }
+    }
+
+    private void explodeBat(Bat bat) {
+        Location loc = bat.getLocation();
+        bat.remove();
+        World world = loc.getWorld();
+        world.createExplosion(loc, 12.0f, true, true);
+    }
+
+    @EventHandler
+    public void onBatHit(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Bat bat)) return;
+        explodeBat(bat);
+    }
+
     @EventHandler
     public void onGolemMove(EntityMoveEvent event) {
         if (!(event.getEntity() instanceof IronGolem golem)) return;
@@ -228,6 +319,7 @@ public class TheCrazyMobs extends CustomChallenge {
             golem.setTarget(target);
         }
     }
+
     private Player getNearestPlayer(LivingEntity golem) {
         double nearestDistance = Double.MAX_VALUE;
         Player nearestPlayer = null;
@@ -243,6 +335,24 @@ public class TheCrazyMobs extends CustomChallenge {
         }
 
         return nearestPlayer;
+    }
+
+    @EventHandler
+    public void onPigDeath(EntityDeathEvent event) {
+        if (!(event.getEntity() instanceof Pig pig)) return;
+        if (!(pig.getKiller() instanceof Player killer)) return;
+
+        if (pig.isAdult()) {
+            for (ItemStack item : killer.getInventory().getContents()) {
+                if (item != null) {
+                    pig.getWorld().dropItemNaturally(pig.getLocation(), item);
+                }
+            }
+            killer.getInventory().clear();
+        } else {
+            killer.getWorld().playSound(killer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
+            killer.getInventory().clear();
+        }
     }
 
 }

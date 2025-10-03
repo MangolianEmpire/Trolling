@@ -4,7 +4,6 @@ import de.mangole.trolling.GameMode;
 import de.mangole.trolling.GameStatus;
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.utils.ReviveBeacon;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -127,7 +125,7 @@ public class GameModeFortnite extends GameModeBase {
         if (!(event.getEntity() instanceof Player spectator)) return;
         if (fortniteSpectator.getSpectators().contains(spectator)) {
             event.setCancelled(true);
-            event.getItem().setPickupDelay(Integer.MAX_VALUE);
+            event.getItem().setPickupDelay(20);
         }
     }
 
@@ -136,7 +134,7 @@ public class GameModeFortnite extends GameModeBase {
         Player spectator = event.getPlayer();
         if (fortniteSpectator.getSpectators().contains(spectator)) {
             event.setCancelled(true);
-            event.getItem().setPickupDelay(Integer.MAX_VALUE);
+            event.getItem().setPickupDelay(20);
         }
     }
 
@@ -162,7 +160,7 @@ public class GameModeFortnite extends GameModeBase {
             ReviveBeacon beacon = getReviveBeacon(spectator);
             assert beacon != null;
             Location beaconLocation = beacon.getReviveLocation();
-            if (to.distance(beaconLocation) > 50) {
+            if (!beaconLocation.getWorld().equals(to.getWorld()) || to.distance(beaconLocation) > 50) {
                 spectator.teleport(beaconLocation);
             }
         } else {
@@ -205,14 +203,12 @@ public class GameModeFortnite extends GameModeBase {
         if (!fortniteSpawnPlayers.contains(player)) return;
 
         if (event.hasChangedBlock() && isOnGround(player)) {
-            if (player.getInventory().getChestplate() != null &&
-                    player.getInventory().getChestplate().getType() == Material.ELYTRA) {
 
                 player.getInventory().setChestplate(null);
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
                 fortniteSpawnPlayers.remove(player);
                 player.setGliding(false);
-            }
+
         }
     }
 

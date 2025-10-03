@@ -17,6 +17,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -53,6 +54,14 @@ public class LobbyListener implements Listener {
         World world = event.getEntity().getWorld();
         if (world.getName().equalsIgnoreCase("ChallengesLobby_world")) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onInteract(PlayerInteractEvent event) {
+        World world = event.getPlayer().getWorld();
+        if (world.getName().equalsIgnoreCase("ChallengesLobby_world")) {
+            if (event.getAction().isLeftClick()) event.setCancelled(true);
         }
     }
 

@@ -3,10 +3,14 @@ package de.mangole.trolling.challenges;
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.utils.CustomChallenge;
 import org.bukkit.Bukkit;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
 public class Communism extends CustomChallenge {
 
@@ -24,6 +28,19 @@ public class Communism extends CustomChallenge {
 
     @EventHandler
     public void onDamage(EntityDamageEvent e) {
+        if (!(e.getEntity() instanceof Player player)) return;
+
+        double finalDamage = e.getFinalDamage();
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (p != player) {
+                p.setHealth(Math.max(player.getHealth() - finalDamage, 0));
+            }
+        }
+    }
+
+    @EventHandler
+    public void onHeal(EntityRegainHealthEvent e) {
         if (!(e.getEntity() instanceof Player player)) return;
 
         Bukkit.getScheduler().runTaskLater(trolling, () -> {

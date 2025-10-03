@@ -12,7 +12,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -62,6 +61,7 @@ public class ChorusInfection extends CustomChallenge {
         Location teleportLocation = possibleLocations.get(teleportLocationIndex);
         teleportLocation.setYaw(currentLocation.getYaw());
         teleportLocation.setPitch(currentLocation.getPitch());
+        teleportLocation.add(0.5, 0, 0.5);
 
         player.teleport(teleportLocation);
         player.getWorld().playSound(teleportLocation, Sound.ITEM_CHORUS_FRUIT_TELEPORT, 1.0f, 1.0f);

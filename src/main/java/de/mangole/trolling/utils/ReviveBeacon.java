@@ -145,7 +145,7 @@ public class ReviveBeacon implements Listener {
     }
 
     private void revivePlayer() {
-        revivePlayer.teleport(block.getLocation());
+        revivePlayer.teleport(block.getLocation().add(0.5, 0.0, 0.5));
         revivePlayer.clearActivePotionEffects();
         revivePlayer.getInventory().clear();
         revivePlayer.setGameMode(GameMode.SURVIVAL);
