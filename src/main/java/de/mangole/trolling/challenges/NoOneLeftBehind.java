@@ -3,6 +3,7 @@ package de.mangole.trolling.challenges;
 import de.mangole.trolling.GameStatus;
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.events.GameChangeEvent;
+import de.mangole.trolling.utils.ChallengeEvent;
 import de.mangole.trolling.utils.CustomChallenge;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
@@ -44,7 +45,7 @@ public class NoOneLeftBehind extends CustomChallenge {
 
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onGameStarted(GameChangeEvent event) {
         if (event.getNewStatus() != GameStatus.RUNNING) {
             return;
