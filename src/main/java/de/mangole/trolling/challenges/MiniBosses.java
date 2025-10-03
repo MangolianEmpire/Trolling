@@ -385,7 +385,7 @@ public class MiniBosses extends CustomChallenge {
     }
 
 
-    @EventHandler
+    @ChallengeEvent
     public void onNecromancerDeath(EntityDeathEvent event) {
         if (!(event.getEntity() instanceof WitherSkeleton witherSkeleton)) return;
         if (witherSkeleton.hasMetadata("isBoss")) {
@@ -400,7 +400,7 @@ public class MiniBosses extends CustomChallenge {
         }
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onPlayerUseSummoningBook(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK)
             return;
@@ -459,7 +459,7 @@ public class MiniBosses extends CustomChallenge {
         isSpawningBoss = false;
     }
 
-    @EventHandler
+    @ChallengeEvent
     public void onMinionTarget(EntityTargetEvent event) {
         if (!(event.getEntity() instanceof Skeleton)) return;
         if (!event.getEntity().hasMetadata("isMinion")) return;
