@@ -5,13 +5,10 @@ import de.mangole.trolling.GameMode;
 import de.mangole.trolling.GameStatus;
 import de.mangole.trolling.Trolling;
 import de.mangole.trolling.utils.ReviveBeacon;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
@@ -238,6 +235,14 @@ public class GameModeFortnite extends GameModeBase {
 
         event.setCancelled(true);
         player.closeInventory();
+    }
+
+    @GameModeEvent
+    public void onSpawnDeath(PlayerDeathEvent event) {
+        Player player = event.getPlayer();
+        if (!fortniteSpawnPlayers.contains(player)) return;
+
+        player.getInventory().clear();
     }
 
 
