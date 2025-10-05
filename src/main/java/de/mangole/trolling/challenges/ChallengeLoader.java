@@ -78,6 +78,9 @@ public class ChallengeLoader {
         NoOneLeftBehind noOneLeftBehind = new NoOneLeftBehind(trolling);
         challenges.add(noOneLeftBehind);
 
+        KeepMoving keepMoving = new KeepMoving(trolling);
+        challenges.add(keepMoving);
+
         // active saved challenges
         for (CustomChallenge challenge : challenges) {
             boolean active = config.getBoolean("challenges." + challenge.getChallengeName(), false);
@@ -186,6 +189,14 @@ public class ChallengeLoader {
                 Component.text("No One Left Behind", NamedTextColor.LIGHT_PURPLE),
                 Component.text("Real friends are always by your side", NamedTextColor.LIGHT_PURPLE),
                 noOneLeftBehind
+        ));
+
+        //KeepMoving
+        customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
+                Material.LAVA_BUCKET,
+                Component.text("Keep Moving", NamedTextColor.GOLD),
+                Component.text("The floor gets hot if you stay still for too long", NamedTextColor.GOLD),
+                keepMoving
         ));
     }
 
