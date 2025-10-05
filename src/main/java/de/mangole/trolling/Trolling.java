@@ -41,7 +41,6 @@ public class Trolling extends JavaPlugin implements Listener {
         getLogger().info("Mein Plugin wurde geladen!");
 
         this.gameManager = new GameManager(this);
-        this.timerManager = new TimerManager(this);
 
         registerEvents();
         registerCommands();
@@ -55,6 +54,7 @@ public class Trolling extends JavaPlugin implements Listener {
         this.data = new Data(this);
         this.protocolManager = ProtocolLibrary.getProtocolManager();
         this.reviveBeaconManager = new ReviveBeaconManager(this);
+        this.timerManager = new TimerManager(this);
 
         if (gameManager.getGameStatus() == GameStatus.LOST) {
             gameManager.stopGame();

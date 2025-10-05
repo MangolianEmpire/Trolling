@@ -30,7 +30,7 @@ public class Data {
     }
 
     private void loadItems() {
-        ItemStack lobbySpawn = new ItemStack(Material.DIAMOND);
+        ItemStack lobbySpawn = new ItemStack(Material.EMERALD);
         ItemMeta spawn_meta = lobbySpawn.getItemMeta();
         spawn_meta.displayName(Component.text("Spawn", NamedTextColor.AQUA));
         spawn_meta.lore(List.of(Component.text("Teleports you back to the Lobby Spawn", NamedTextColor.AQUA)));

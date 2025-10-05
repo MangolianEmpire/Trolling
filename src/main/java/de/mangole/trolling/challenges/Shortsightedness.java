@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -21,8 +22,6 @@ public class Shortsightedness extends CustomChallenge {
     @Override
     protected void onActivate() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            player.setViewDistance(2);
-            player.setSendViewDistance(2);
             player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
         }
     }
@@ -30,14 +29,18 @@ public class Shortsightedness extends CustomChallenge {
     @Override
     protected void onDeactivate() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            player.setViewDistance(12);
-            player.setSendViewDistance(12);
             player.clearActivePotionEffects();
         }
     }
 
     @ChallengeEvent
     public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
+    }
+
+    @ChallengeEvent
+    public void onRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
     }

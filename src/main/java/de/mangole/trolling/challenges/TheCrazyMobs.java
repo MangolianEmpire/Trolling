@@ -54,11 +54,12 @@ public class TheCrazyMobs extends CustomChallenge {
     public void onBatDetectPlayer(PlayerMoveEvent event) {
         Location loc = event.getPlayer().getLocation();
 
-        activeBats.addAll(loc.getNearbyEntitiesByType(Bat.class, 20));
+        activeBats.addAll(loc.getNearbyEntitiesByType(Bat.class, 10));
     }
 
     private @NotNull BukkitTask startBatTracking() {
         return new BukkitRunnable() {
+            long counter = 0;
             @Override
             public void run() {
                 Iterator<Bat> it = activeBats.iterator();
@@ -68,6 +69,13 @@ public class TheCrazyMobs extends CustomChallenge {
                         it.remove();
                         continue;
                     }
+
+                    if (counter % 40 == 0) {
+                        World world = bat.getWorld();
+                        for (Player player : world.getNearbyPlayers(bat.getLocation(), 10))
+                            player.playSound(player.getLocation(), Sound.ENTITY_BEE_LOOP_AGGRESSIVE, 1.0f, 2.0f);
+                    }
+                    counter += 5;
 
                     Player target = getNearestVisiblePlayer(bat);
                     if (target != null) {
@@ -331,7 +339,7 @@ public class TheCrazyMobs extends CustomChallenge {
         for (Player player : golem.getWorld().getPlayers()) {
             if (!player.isDead() && (player.getGameMode() == GameMode.SURVIVAL)) {
                 double distance = player.getLocation().distanceSquared(golem.getLocation());
-                if (distance < nearestDistance) {
+                if (distance < 400 && distance < nearestDistance) {
                     nearestDistance = distance;
                     nearestPlayer = player;
                 }
