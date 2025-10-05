@@ -4,11 +4,14 @@ import de.mangole.trolling.Trolling;
 import de.mangole.trolling.gamemodes.GameModeFortnite;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.UUID;
 
 public class ReviveBeaconManager {
 
@@ -33,13 +36,14 @@ public class ReviveBeaconManager {
             double z = config.getDouble("beacons." + key + ".z");
             String worldName = config.getString("beacons." + key + ".world");
 
-            Player player = Bukkit.getPlayer(java.util.UUID.fromString(playerUUID));
-            if (player == null) continue;
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(playerUUID));
+
 
             if (Bukkit.getWorld(worldName) == null) continue;
 
             Location loc = new Location(Bukkit.getWorld(worldName), x, y, z);
-            GameModeFortnite.reviveBeacons.add(new ReviveBeacon(trolling, player, 5, 200, loc.getBlock()));
+
+            GameModeFortnite.reviveBeacons.add(new ReviveBeacon(trolling, offlinePlayer, 5, 200, loc.getBlock()));
         }
     }
 
@@ -47,9 +51,9 @@ public class ReviveBeaconManager {
         config.set("beacons", null);
 
         int index = 0;
-        for (ReviveBeacon beacon : GameModeFortnite.reviveBeacons) {
+        for (ReviveBeacon beacon : new ArrayList<>(GameModeFortnite.reviveBeacons)) {
             String path = "beacons." + index;
-            config.set(path + ".player", beacon.getRevivePlayer().getUniqueId().toString());
+            config.set(path + ".player", beacon.getOfflinePlayer().getUniqueId().toString());
             config.set(path + ".x", beacon.getReviveLocation().getX());
             config.set(path + ".y", beacon.getReviveLocation().getY());
             config.set(path + ".z", beacon.getReviveLocation().getZ());
@@ -64,5 +68,6 @@ public class ReviveBeaconManager {
             e.printStackTrace();
         }
     }
+
 }
 

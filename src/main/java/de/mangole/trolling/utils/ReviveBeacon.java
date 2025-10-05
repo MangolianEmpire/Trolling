@@ -24,6 +24,7 @@ import org.bukkit.scheduler.BukkitTask;
 public class ReviveBeacon implements Listener {
 
     private final Trolling trolling;
+    private final OfflinePlayer offlinePlayer;
     private Player revivePlayer;
     private final double reviveRange;
     private int reviveProgress = 0;
@@ -32,17 +33,22 @@ public class ReviveBeacon implements Listener {
     private final Block block;
     private final Block[] foundation;
     private final Material[] foundationMats;
-    private final BukkitTask reviveTask;
+    private BukkitTask reviveTask = null;
     private TextDisplay progressDisplay;
+    private boolean active = false;
 
     public ReviveBeacon(Trolling trolling, Player revivePlayer, int reviveRange, int reviveDuration, Block block) {
+        this(trolling, (OfflinePlayer) revivePlayer, reviveRange, reviveDuration, block);
+        this.active = true;
+    }
+
+    public ReviveBeacon(Trolling trolling, OfflinePlayer offlinePlayer, int reviveRange, int reviveDuration, Block block) {
         this.trolling = trolling;
-        this.revivePlayer = revivePlayer;
+        this.offlinePlayer = offlinePlayer;
         this.reviveRange = reviveRange;
         this.reviveDuration = reviveDuration;
         this.block = block;
-
-        Bukkit.getPluginManager().registerEvents(this, trolling);
+        this.active = false;
 
         oldBlock = block.getType();
         block.setType(Material.BEACON);
@@ -60,10 +66,25 @@ public class ReviveBeacon implements Listener {
             }
         }
 
-        reviveTask = startReviveTask();
+        Bukkit.getPluginManager().registerEvents(this, trolling);
+        showProgressText();
+        updateReviveProgressText();
+
+        if (offlinePlayer.isOnline()) {
+            this.revivePlayer = offlinePlayer.getPlayer();
+            reviveTask = startReviveTask();
+        }
     }
 
-    private BukkitTask startReviveTask() {
+    public boolean isActive() { return active; }
+
+    public void activateBeacon(Player revivePlayer) {
+        this.revivePlayer = revivePlayer;
+        reviveTask = startReviveTask();
+        active = true;
+    }
+
+    private void showProgressText() {
         Location loc = block.getLocation().clone().add(0.0, 1, 0.0);
 
         if (progressDisplay == null || progressDisplay.isDead()) {
@@ -72,6 +93,11 @@ public class ReviveBeacon implements Listener {
                 textDisplay.setBackgroundColor(Color.GREEN);
             });
         }
+    }
+
+    private BukkitTask startReviveTask() {
+        showProgressText();
+        Location loc = block.getLocation();
 
         return new BukkitRunnable() {
             long counter = 0;
@@ -114,7 +140,8 @@ public class ReviveBeacon implements Listener {
     private void updateReviveProgressText() {
         double percent = (double) reviveProgress / reviveDuration;
         if (progressDisplay != null) {
-            progressDisplay.text(Component.text(String.format("%.0f%%", percent * 100), NamedTextColor.YELLOW));
+            progressDisplay.text(Component.text(offlinePlayer.getName() + "\n")
+                    .append(Component.text(String.format("%.0f%%", percent * 100), NamedTextColor.YELLOW)));
         }
     }
 
@@ -140,6 +167,8 @@ public class ReviveBeacon implements Listener {
         revivePlayer.setGameMode(GameMode.SURVIVAL);
         block.getWorld().playSound(block.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
         Bukkit.getPluginManager().callEvent(new PlayerRespawnEvent(revivePlayer, block.getLocation(), false, false, false, PlayerRespawnEvent.RespawnReason.PLUGIN));
+        revivePlayer.setHealth(0.5 * revivePlayer.getMaxHealth());
+        revivePlayer.setFoodLevel(10);
     }
 
     public void cleanup() {
@@ -162,6 +191,8 @@ public class ReviveBeacon implements Listener {
     }
 
     public Player getRevivePlayer() { return revivePlayer; }
+
+    public OfflinePlayer getOfflinePlayer() { return offlinePlayer; }
 
     public Location getReviveLocation() { return block.getLocation(); }
 

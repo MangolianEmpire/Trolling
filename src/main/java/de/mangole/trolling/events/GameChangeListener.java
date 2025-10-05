@@ -15,6 +15,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.ArrayList;
+
 public class GameChangeListener implements Listener {
 
     private final Trolling trolling;
@@ -51,7 +53,7 @@ public class GameChangeListener implements Listener {
         }
 
         if (newStatus == GameStatus.LOBBY) {
-            for (ReviveBeacon reviveBeacon : GameModeFortnite.reviveBeacons) {
+            for (ReviveBeacon reviveBeacon : new ArrayList<>(GameModeFortnite.reviveBeacons)) {
                 reviveBeacon.cleanup();
             }
             Bukkit.getOnlinePlayers().forEach(player -> {

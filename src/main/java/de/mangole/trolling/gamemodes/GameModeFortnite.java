@@ -38,9 +38,11 @@ public class GameModeFortnite extends GameModeBase {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         for (ReviveBeacon beacon : reviveBeacons) {
-            if (beacon != null && beacon.getRevivePlayer() != null && beacon.getRevivePlayer().getUniqueId().equals(player.getUniqueId())) {
-                beacon.setRevivePlayer(player);
+            if (beacon != null && beacon.getOfflinePlayer().getUniqueId().equals(player.getUniqueId())) {
+                if (!beacon.isActive())
+                    beacon.activateBeacon(player);
                 player.teleport(beacon.getReviveLocation().add(0.5, 0, 0.5));
+                beacon.setRevivePlayer(player);
                 fortniteSpectator.setFortniteSpectator(player);
             }
         }
@@ -242,7 +244,9 @@ public class GameModeFortnite extends GameModeBase {
         Player player = event.getPlayer();
         if (!fortniteSpawnPlayers.contains(player)) return;
 
+        player.getInventory().setChestplate(null);
         player.getInventory().clear();
+        event.getDrops().clear();
     }
 
 
