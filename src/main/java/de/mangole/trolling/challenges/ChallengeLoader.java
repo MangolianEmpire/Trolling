@@ -81,6 +81,9 @@ public class ChallengeLoader {
         KeepMoving keepMoving = new KeepMoving(trolling);
         challenges.add(keepMoving);
 
+        DontTouch dontTouch = new DontTouch(trolling);
+        challenges.add(dontTouch);
+
         // active saved challenges
         for (CustomChallenge challenge : challenges) {
             boolean active = config.getBoolean("challenges." + challenge.getChallengeName(), false);
@@ -197,6 +200,14 @@ public class ChallengeLoader {
                 Component.text("Keep Moving", NamedTextColor.GOLD),
                 Component.text("The floor gets hot if you stay still for too long", NamedTextColor.GOLD),
                 keepMoving
+        ));
+
+        //DontTouch
+        customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
+                Material.LEATHER_BOOTS,
+                Component.text("Dont touch that block", NamedTextColor.DARK_RED),
+                Component.text("The floor is lava but not every floor", NamedTextColor.DARK_RED),
+                dontTouch
         ));
     }
 

@@ -62,6 +62,14 @@ public class GameChangeListener implements Listener {
                     player.setGameMode(GameMode.CREATIVE);
                 }
             });
+            if (event.getNewMode() == de.mangole.trolling.GameMode.CHALLENGE || event.getNewMode() == de.mangole.trolling.GameMode.FORTNITE) {
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        Bukkit.getPluginCommand("worldreset").execute(Bukkit.getConsoleSender(), "worldreset", new String[]{"hard"});
+                    }
+                }.runTaskLater(trolling, 20L);
+            }
         }
 
         if (newStatus == GameStatus.PAUSED) {
