@@ -51,7 +51,7 @@ public class PlayerInitUtils {
     public static void initPlayerGame(Player player) {
         World gameOverWorld = Bukkit.getWorld("game_overworld");
         player.getInventory().clear();
-        player.teleport(gameOverWorld.getSpawnLocation());
+        player.teleport(gameOverWorld.getSpawnLocation().add(0.5, 0.0, 0.5));
         player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1F);
         player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.MAX_HEALTH)).getBaseValue());
         player.setFoodLevel(20);
@@ -71,7 +71,7 @@ public class PlayerInitUtils {
     public static void initPlayerCreative(Player player) {
         World gameOverWorld = Bukkit.getWorld("game_overworld");
         player.getInventory().clear();
-        player.teleport(gameOverWorld.getSpawnLocation());
+        player.teleport(gameOverWorld.getSpawnLocation().add(0.5, 0.0, 0.5));
         player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1F);
         player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.MAX_HEALTH)).getBaseValue());
         player.setFoodLevel(20);
