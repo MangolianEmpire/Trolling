@@ -123,12 +123,12 @@ public class TheCrazyMobs extends CustomChallenge {
         Location loc = bat.getLocation();
         bat.remove();
         World world = loc.getWorld();
-        world.createExplosion(loc, 12.0f, true, true);
+        world.createExplosion(loc, 6.0f, true, true);
     }
 
     @ChallengeEvent
     public void onBatHit(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Bat bat)) return;
+        if (!(event.getEntity() instanceof Bat bat)) return;
         explodeBat(bat);
     }
 
