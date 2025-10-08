@@ -289,7 +289,7 @@ public class TheCrazyMobs extends CustomChallenge {
         if (event.getEntityType() != EntityType.CHICKEN) return;
         Location loc = event.getEntity().getLocation();
 
-        double radius = 3.0;
+        double radius = 1.5;
         double knockback_strength = 3.0;
         double damage = 6.0;
 
