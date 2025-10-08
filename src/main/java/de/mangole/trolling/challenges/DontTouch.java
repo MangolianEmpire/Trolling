@@ -23,9 +23,7 @@ public class DontTouch extends CustomChallenge {
             Material.STONE,
             Material.SAND,
             Material.WATER,
-            Material.NETHERRACK,
-            Material.SOUL_SAND,
-            Material.GRAVEL
+            Material.NETHERRACK
     };
     private Material dontTouch = null;
     private Material[] oldSpawn = new Material[9];
@@ -51,7 +49,7 @@ public class DontTouch extends CustomChallenge {
         new BukkitRunnable() {
             @Override
             public void run() {
-                showDeadlyBlock(event.getPlayer());
+                if (setup) showDeadlyBlock(event.getPlayer());
             }
         }.runTaskLater(trolling, 20L);
     }

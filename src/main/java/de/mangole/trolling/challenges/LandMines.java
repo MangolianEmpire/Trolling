@@ -68,7 +68,7 @@ public class LandMines extends CustomChallenge {
             return;
         }
         playerCooldowns.put(playerId, currentTime);
-        if (random.nextDouble() < 0.0025) {
+        if (random.nextDouble() < 0.001) {
             world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, underLoc, 50, 0.5, 0.5, 0.5, 0.1);
             world.playSound(underLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 1.0f);
             world.createExplosion(player.getLocation(), 6.0f, true, true);

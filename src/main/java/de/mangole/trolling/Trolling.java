@@ -12,6 +12,7 @@ import de.mangole.trolling.events.GameLogicListener;
 import de.mangole.trolling.events.GamePortalListener;
 import de.mangole.trolling.events.LobbyListener;
 import de.mangole.trolling.utils.CustomInventoryListener;
+import de.mangole.trolling.utils.DeathcounterManager;
 import de.mangole.trolling.utils.ReviveBeaconManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,6 +31,7 @@ public class Trolling extends JavaPlugin implements Listener {
     private ReviveBeaconManager reviveBeaconManager;
     private ProtocolManager protocolManager;
     private LobbyListener lobbyListener;
+    private DeathcounterManager deathcounterManager;
     public static Plugin plugin;
 
     @Override
@@ -41,6 +43,7 @@ public class Trolling extends JavaPlugin implements Listener {
         getLogger().info("Mein Plugin wurde geladen!");
 
         this.gameManager = new GameManager(this);
+        this.deathcounterManager = new DeathcounterManager(this);
 
         registerEvents();
         registerCommands();
@@ -79,6 +82,10 @@ public class Trolling extends JavaPlugin implements Listener {
 
         if (this.reviveBeaconManager != null) {
             reviveBeaconManager.saveBeacons();
+        }
+
+        if (this.deathcounterManager != null) {
+            deathcounterManager.saveDeaths();
         }
     }
 
