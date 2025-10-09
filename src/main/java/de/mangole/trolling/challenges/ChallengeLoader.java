@@ -84,6 +84,12 @@ public class ChallengeLoader {
         DontTouch dontTouch = new DontTouch(trolling);
         challenges.add(dontTouch);
 
+        OneHotbar oneHotbar = new OneHotbar(trolling);
+        challenges.add(oneHotbar);
+
+        OneSlot oneSlot = new OneSlot(trolling);
+        challenges.add(oneSlot);
+
         // active saved challenges
         for (CustomChallenge challenge : challenges) {
             boolean active = config.getBoolean("challenges." + challenge.getChallengeName(), false);
@@ -208,6 +214,22 @@ public class ChallengeLoader {
                 Component.text("Dont touch that block", NamedTextColor.DARK_RED),
                 Component.text("The floor is lava but not every floor", NamedTextColor.DARK_RED),
                 dontTouch
+        ));
+
+        //OneHotbar
+        customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
+                Material.BARRIER,
+                Component.text("One Hotbar", NamedTextColor.WHITE),
+                Component.text("Smaller trouser pockets", NamedTextColor.WHITE),
+                oneHotbar
+        ));
+
+        //OneSlot
+        customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
+                Material.BARRIER,
+                Component.text("One Slot", NamedTextColor.GRAY),
+                Component.text("No trouser pockets anymore. Are you wearing girls fashion?", NamedTextColor.GRAY),
+                oneSlot
         ));
     }
 
