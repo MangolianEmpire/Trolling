@@ -13,6 +13,7 @@ import de.mangole.trolling.events.GamePortalListener;
 import de.mangole.trolling.events.LobbyListener;
 import de.mangole.trolling.utils.CustomInventoryListener;
 import de.mangole.trolling.utils.DeathcounterManager;
+import de.mangole.trolling.utils.HealthDisplay;
 import de.mangole.trolling.utils.ReviveBeaconManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -97,6 +98,7 @@ public class Trolling extends JavaPlugin implements Listener {
         pluginManager.registerEvents(new GamePortalListener(this), this);
         pluginManager.registerEvents(new GameChangeListener(this), this);
         pluginManager.registerEvents(new GameLogicListener(this), this);
+        pluginManager.registerEvents(new HealthDisplay(this), this);
     }
 
     private void registerCommands() {
