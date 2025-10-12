@@ -7,6 +7,7 @@ import de.mangole.trolling.commands.ChallengeEdit;
 import de.mangole.trolling.commands.GameChange;
 import de.mangole.trolling.commands.WorldCommand;
 import de.mangole.trolling.commands.WorldReset;
+import de.mangole.trolling.customItems.CustomItemData;
 import de.mangole.trolling.events.GameChangeListener;
 import de.mangole.trolling.events.GameLogicListener;
 import de.mangole.trolling.events.GamePortalListener;
@@ -33,6 +34,7 @@ public class Trolling extends JavaPlugin implements Listener {
     private ProtocolManager protocolManager;
     private LobbyListener lobbyListener;
     private DeathcounterManager deathcounterManager;
+    private CustomItemData customItemData;
     public static Plugin plugin;
 
     @Override
@@ -45,6 +47,7 @@ public class Trolling extends JavaPlugin implements Listener {
 
         this.gameManager = new GameManager(this);
         this.deathcounterManager = new DeathcounterManager(this);
+        this.customItemData = new CustomItemData(this);
 
         registerEvents();
         registerCommands();

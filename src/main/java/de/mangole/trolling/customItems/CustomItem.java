@@ -64,6 +64,26 @@ public abstract class CustomItem implements Listener {
         this.item = item;
     }
 
+    public boolean isCustomItem(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return false;
+        if (!item.hasItemMeta()) return false;
+
+        ItemMeta meta = item.getItemMeta();
+        NamespacedKey itemKey = new NamespacedKey(trolling, "custom_item");
+
+        // Wenn der Key nicht existiert → kein CustomItem
+        if (!meta.getPersistentDataContainer().has(itemKey, PersistentDataType.STRING)) {
+            return false;
+        }
+
+        String storedName = meta.getPersistentDataContainer().get(itemKey, PersistentDataType.STRING);
+        String thisName = this.name.toString();
+
+        // Vergleich auf Basis des gespeicherten Strings
+        return storedName != null && storedName.equals(thisName);
+    }
+
+
     public ItemStack getItemStack() {
         return item;
     }
@@ -72,19 +92,22 @@ public abstract class CustomItem implements Listener {
     private void registerAnnotatedEvents(Trolling trolling) {
         for (Method method : getClass().getDeclaredMethods()) {
             if (!method.isAnnotationPresent(CustomItemEvent.class)) continue;
-
             if (method.getParameterCount() != 1) continue;
+
             Class<?> paramType = method.getParameterTypes()[0];
             if (!Event.class.isAssignableFrom(paramType)) continue;
 
             EventExecutor executor = (listener, event) -> {
-                if (paramType.isAssignableFrom(event.getClass())) {
-                    try {
-                        method.setAccessible(true);
-                        method.invoke(this, event);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                if (!paramType.isAssignableFrom(event.getClass())) return;
+
+                ItemStack item = extractItemFromEvent(event);
+                if (item == null || !isCustomItem(item)) return;
+
+                try {
+                    method.setAccessible(true);
+                    method.invoke(this, event);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             };
 
@@ -97,4 +120,29 @@ public abstract class CustomItem implements Listener {
             );
         }
     }
+
+
+    private ItemStack extractItemFromEvent(Event event) {
+        if (event instanceof org.bukkit.event.player.PlayerInteractEvent e)
+            return e.getItem();
+
+        if (event instanceof org.bukkit.event.player.PlayerItemConsumeEvent e)
+            return e.getItem();
+
+        if (event instanceof org.bukkit.event.player.PlayerItemHeldEvent e)
+            return e.getPlayer().getInventory().getItem(e.getNewSlot());
+
+        if (event instanceof org.bukkit.event.inventory.InventoryClickEvent e)
+            return e.getCurrentItem();
+
+        if (event instanceof org.bukkit.event.entity.EntityDamageByEntityEvent e
+                && e.getDamager() instanceof org.bukkit.entity.Player p)
+            return p.getInventory().getItemInMainHand();
+
+        if (event instanceof org.bukkit.event.player.PlayerDropItemEvent e)
+            return e.getItemDrop().getItemStack();
+
+        return null;
+    }
+
 }
