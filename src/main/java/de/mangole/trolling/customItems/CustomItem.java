@@ -5,16 +5,18 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.EventExecutor;
 
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class CustomItem implements Listener {
 
@@ -55,11 +57,6 @@ public abstract class CustomItem implements Listener {
         NamespacedKey itemKey = new NamespacedKey(trolling, "custom_item");
         meta.getPersistentDataContainer().set(itemKey, PersistentDataType.STRING, name.toString());
 
-        if (!stackable) {
-            NamespacedKey uniqueKey = new NamespacedKey(trolling, "unique_id");
-            meta.getPersistentDataContainer().set(uniqueKey, PersistentDataType.STRING, UUID.randomUUID().toString());
-        }
-
         item.setItemMeta(meta);
         this.item = item;
     }
@@ -85,12 +82,29 @@ public abstract class CustomItem implements Listener {
 
 
     public ItemStack getItemStack() {
-        return item;
+        ItemStack clone = item.clone();
+
+        if (!stackable) {
+            ItemMeta meta = clone.getItemMeta();
+            NamespacedKey uniqueKey = new NamespacedKey(trolling, "unique_id");
+            meta.getPersistentDataContainer().set(uniqueKey, PersistentDataType.STRING, UUID.randomUUID().toString());
+            clone.setItemMeta(meta);
+        }
+
+        return clone;
     }
 
 
-    private void registerAnnotatedEvents(Trolling trolling) {
-        for (Method method : getClass().getDeclaredMethods()) {
+    protected void registerAnnotatedEvents(Trolling trolling) {
+        Class<?> clazz = getClass();
+        Set<Method> methods = new HashSet<>();
+
+        while (clazz != null && clazz != Object.class) {
+            Collections.addAll(methods, clazz.getDeclaredMethods());
+            clazz = clazz.getSuperclass();
+        }
+
+        for (Method method : methods) {
             if (!method.isAnnotationPresent(CustomItemEvent.class)) continue;
             if (method.getParameterCount() != 1) continue;
 
@@ -132,8 +146,12 @@ public abstract class CustomItem implements Listener {
         if (event instanceof org.bukkit.event.player.PlayerItemHeldEvent e)
             return e.getPlayer().getInventory().getItem(e.getNewSlot());
 
-        if (event instanceof org.bukkit.event.inventory.InventoryClickEvent e)
-            return e.getCurrentItem();
+        if (event instanceof org.bukkit.event.inventory.InventoryClickEvent e) {
+            if (isCustomItem(e.getCursor()))
+                return e.getCursor();
+            if (isCustomItem(e.getCurrentItem()))
+                return e.getCurrentItem();
+        }
 
         if (event instanceof org.bukkit.event.entity.EntityDamageByEntityEvent e
                 && e.getDamager() instanceof org.bukkit.entity.Player p)
@@ -142,7 +160,71 @@ public abstract class CustomItem implements Listener {
         if (event instanceof org.bukkit.event.player.PlayerDropItemEvent e)
             return e.getItemDrop().getItemStack();
 
+        if (event instanceof org.bukkit.event.block.BlockPlaceEvent e)
+            return e.getItemInHand();
+
+        if (event instanceof CraftItemEvent e)
+            return e.getRecipe().getResult();
+
         return null;
     }
 
+    @CustomItemEvent
+    protected void onPlace(BlockPlaceEvent event) {
+        event.setCancelled(true);
+    }
+
+    @CustomItemEvent
+    public void onCraftItem(CraftItemEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+
+        ItemStack result = event.getRecipe().getResult();
+
+        // Wenn das Item nicht stapelbar ist
+        if (!this.stackable) {
+            event.setCancelled(true); // Vanilla-Crafting blocken, wir übernehmen selbst
+
+            // Crafting-Inventar und Matrix
+            var inv = event.getInventory();
+            var matrix = inv.getMatrix();
+
+            // Versuche das Rezept so oft zu craften, wie möglich
+            int crafts = getMaxCraftableCount(matrix);
+
+            for (int i = 0; i < crafts; i++) {
+                ItemStack single = getItemStack().clone();
+                single.setAmount(1);
+
+                // Versuch, Item ins Inventar zu legen
+                HashMap<Integer, ItemStack> leftover = player.getInventory().addItem(single);
+
+                // Wenn kein Platz mehr ist → abbrechen
+                if (!leftover.isEmpty()) break;
+
+                // Zutaten wie bei Vanilla-Crafting reduzieren
+                for (int slot = 0; slot < matrix.length; slot++) {
+                    ItemStack ingredient = matrix[slot];
+                    if (ingredient == null || ingredient.getType() == Material.AIR) continue;
+                    ingredient.setAmount(ingredient.getAmount() - 1);
+                    if (ingredient.getAmount() <= 0) matrix[slot] = null;
+                }
+            }
+
+            // Crafting-Matrix updaten
+            inv.setMatrix(matrix);
+            player.updateInventory();
+        }
+    }
+
+    /**
+     * Ermittelt, wie oft das aktuelle Rezept hergestellt werden kann (wie Vanilla beim Shift-Klick).
+     */
+    private int getMaxCraftableCount(ItemStack[] matrix) {
+        int min = Integer.MAX_VALUE;
+        for (ItemStack item : matrix) {
+            if (item == null || item.getType() == Material.AIR) continue;
+            min = Math.min(min, item.getAmount());
+        }
+        return min == Integer.MAX_VALUE ? 0 : min;
+    }
 }

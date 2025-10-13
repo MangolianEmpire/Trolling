@@ -1,8 +1,10 @@
 package de.mangole.trolling.challenges;
 
 import de.mangole.trolling.Trolling;
+import de.mangole.trolling.customItems.items.Glasses;
 import de.mangole.trolling.utils.ChallengeEvent;
 import de.mangole.trolling.utils.CustomChallenge;
+import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,8 +17,11 @@ import org.bukkit.potion.PotionEffectType;
 
 public class Shortsightedness extends CustomChallenge {
 
+    private final Glasses glasses;
+
     public Shortsightedness(Trolling trolling) {
         super(trolling, "Shortsightedness");
+        glasses = trolling.getCustomItemData().getGlasses();
     }
 
     @Override
@@ -24,6 +29,7 @@ public class Shortsightedness extends CustomChallenge {
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
         }
+        glasses.registerGlassesRecipe();
     }
 
     @Override
@@ -31,6 +37,7 @@ public class Shortsightedness extends CustomChallenge {
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.clearActivePotionEffects();
         }
+        glasses.removeGlassesRecipe();
     }
 
     @ChallengeEvent
@@ -57,4 +64,19 @@ public class Shortsightedness extends CustomChallenge {
         }
     }
 
+    @ChallengeEvent
+    public void onGlassesEquip(PlayerInventorySlotChangeEvent event) {
+        if (event.getSlot() != 39) return;
+
+        ItemStack newItem = event.getNewItemStack();
+        Player player = event.getPlayer();
+
+        if (glasses.isCustomItem(newItem)) {
+            player.removePotionEffect(PotionEffectType.BLINDNESS);
+            return;
+        }
+        if (newItem.getType() == Material.AIR) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
+        }
+    }
 }

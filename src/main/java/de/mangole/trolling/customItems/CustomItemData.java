@@ -7,7 +7,7 @@ public class CustomItemData {
 
     private final Trolling trolling;
 
-    private CustomItem glasses;
+    private Glasses glasses;
 
     public CustomItemData(final Trolling trolling) {
         this.trolling = trolling;
@@ -19,7 +19,7 @@ public class CustomItemData {
         this.glasses = new Glasses(trolling);
     }
 
-    public CustomItem getGlasses() {
+    public Glasses getGlasses() {
         return glasses;
     }
 }

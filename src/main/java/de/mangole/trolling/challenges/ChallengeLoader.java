@@ -94,6 +94,7 @@ public class ChallengeLoader {
         for (CustomChallenge challenge : challenges) {
             boolean active = config.getBoolean("challenges." + challenge.getChallengeName(), false);
             if (active) challenge.activate();
+            else challenge.deactivate();
         }
 
         // FallDamage

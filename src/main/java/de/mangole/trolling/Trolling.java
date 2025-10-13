@@ -134,5 +134,9 @@ public class Trolling extends JavaPlugin implements Listener {
     public LobbyListener getLobbyListener() {
         return lobbyListener;
     }
+
+    public CustomItemData getCustomItemData() {
+        return customItemData;
+    }
 }
 
