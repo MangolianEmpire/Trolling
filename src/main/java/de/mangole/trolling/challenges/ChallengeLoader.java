@@ -90,6 +90,9 @@ public class ChallengeLoader {
         OneSlot oneSlot = new OneSlot(trolling);
         challenges.add(oneSlot);
 
+        LaggingDamage laggingDamage = new LaggingDamage(trolling);
+        challenges.add(laggingDamage);
+
         // active saved challenges
         for (CustomChallenge challenge : challenges) {
             boolean active = config.getBoolean("challenges." + challenge.getChallengeName(), false);
@@ -231,6 +234,14 @@ public class ChallengeLoader {
                 Component.text("One Slot", NamedTextColor.GRAY),
                 Component.text("No trouser pockets anymore. Are you wearing girls fashion?", NamedTextColor.GRAY),
                 oneSlot
+        ));
+
+        //LaggingDamage
+        customChallengeItems.add(CustomChallengeItemUtils.createCustomChallengeItem(
+                Material.REPEATER,
+                Component.text("Lagging Damage", NamedTextColor.DARK_GRAY),
+                Component.text("Your internet is slow and damage gets delayed", NamedTextColor.DARK_GRAY),
+                laggingDamage
         ));
     }
 
