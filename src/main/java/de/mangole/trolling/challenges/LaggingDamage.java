@@ -91,8 +91,8 @@ public class LaggingDamage extends CustomChallenge {
         }
 
         if (!damageCountdown.containsKey(uuid)) {
-            int random = new Random().nextInt(10);
-            damageCountdown.put(uuid, 10 + random);
+            int random = player.getPing() * 3 + new Random().nextInt(100);
+            damageCountdown.put(uuid, 100 + random);
         }
 
         event.setCancelled(true);
