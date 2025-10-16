@@ -2,9 +2,15 @@ package de.mangole.trolling.customMobs;
 
 import de.mangole.trolling.Trolling;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Mob;
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.plugin.EventExecutor;
 
 import java.lang.reflect.Method;
@@ -12,27 +18,61 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class CustomMob implements Listener {
+public abstract class CustomMob implements ICustomMob, Listener {
 
     protected Trolling trolling;
+    protected Class<? extends Mob> mobClass;
     protected Mob mob;
     protected String name;
+    protected String id;
     protected boolean visibleName;
     protected double health;
 
-    public CustomMob(Trolling trolling, Mob mob) {
-        this(trolling, mob, "", false);
-    }
-
-    public CustomMob(Trolling trolling, Mob mob, String name) {
-        this(trolling, mob, name, false);
-    }
-
-    public CustomMob(Trolling trolling, Mob mob, String name, boolean visibleName) {
+    public CustomMob(Trolling trolling, String id, Class<? extends Mob> mobClass, String name, boolean visibleName, double health) {
         this.trolling = trolling;
-        this.mob = mob;
+        this.id = id;
+        this.mobClass = mobClass;
         this.name = name;
         this.visibleName = visibleName;
+        this.health = health;
+    }
+
+    @Override
+    public void spawn(Location location) {
+        Mob newMob = location.getWorld().spawn(location, mobClass, (m) -> {
+            m.getAttribute(Attribute.MAX_HEALTH).setBaseValue(health);
+            m.setCustomName(name);
+            m.setCustomNameVisible(visibleName);
+        }, CreatureSpawnEvent.SpawnReason.CUSTOM);
+
+        this.mob = newMob;
+        registerCustomMobEvents();
+    }
+
+    private boolean destroyed = false;
+
+    @Override
+    public void destroy() {
+        if (destroyed) return;
+        destroyed = true;
+
+        HandlerList.unregisterAll(this);
+        if (mob != null && !mob.isDead()) mob.remove();
+    }
+
+    @Override
+    public Mob getMob() {
+        return mob;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     protected void registerCustomMobEvents() {
@@ -84,5 +124,15 @@ public abstract class CustomMob implements Listener {
                     trolling
             );
         }
+    }
+
+    @CustomMobEvent
+    private void onDeath(EntityDeathEvent event) {
+        destroy();
+    }
+
+    @CustomMobEvent
+    private void onRemove(EntityRemoveEvent event) {
+        destroy();
     }
 }

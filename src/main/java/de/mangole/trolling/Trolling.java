@@ -8,6 +8,7 @@ import de.mangole.trolling.commands.GameChange;
 import de.mangole.trolling.commands.WorldCommand;
 import de.mangole.trolling.commands.WorldReset;
 import de.mangole.trolling.customItems.CustomItemData;
+import de.mangole.trolling.customMobs.CustomMobData;
 import de.mangole.trolling.events.GameChangeListener;
 import de.mangole.trolling.events.GameLogicListener;
 import de.mangole.trolling.events.GamePortalListener;
@@ -35,6 +36,7 @@ public class Trolling extends JavaPlugin implements Listener {
     private LobbyListener lobbyListener;
     private DeathcounterManager deathcounterManager;
     private CustomItemData customItemData;
+    private CustomMobData customMobData;
     public static Plugin plugin;
 
     @Override
@@ -48,6 +50,7 @@ public class Trolling extends JavaPlugin implements Listener {
         this.gameManager = new GameManager(this);
         this.deathcounterManager = new DeathcounterManager(this);
         this.customItemData = new CustomItemData(this);
+        this.customMobData = new CustomMobData(this);
 
         registerEvents();
         registerCommands();
@@ -90,6 +93,10 @@ public class Trolling extends JavaPlugin implements Listener {
 
         if (this.deathcounterManager != null) {
             deathcounterManager.saveDeaths();
+        }
+
+        if (this.customMobData != null) {
+            customMobData.destroyAll();
         }
     }
 
@@ -137,6 +144,10 @@ public class Trolling extends JavaPlugin implements Listener {
 
     public CustomItemData getCustomItemData() {
         return customItemData;
+    }
+
+    public CustomMobData getCustomMobData() {
+        return customMobData;
     }
 }
 

@@ -8,4 +8,7 @@ import java.util.List;
 public interface CustomLootDroppable {
 
     List<ItemStack> drops = new ArrayList<>();
+
+    List<ItemStack> getDrops();
+    void setDrops(List<ItemStack> drops);
 }

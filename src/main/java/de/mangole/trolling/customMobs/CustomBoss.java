@@ -5,15 +5,7 @@ import org.bukkit.entity.Mob;
 
 public abstract class CustomBoss extends CustomMob implements CustomLootDroppable {
 
-    public CustomBoss(Trolling trolling, Mob mob) {
-        super(trolling, mob);
-    }
-
-    public CustomBoss(Trolling trolling, Mob mob, String name) {
-        super(trolling, mob, name);
-    }
-
-    public CustomBoss(Trolling trolling, Mob mob, String name, boolean visibleName) {
-        super(trolling, mob, name, visibleName);
+    public CustomBoss(Trolling trolling, String id, Class<? extends Mob> mobClass, String name, boolean visibleName, double health) {
+        super(trolling, id, mobClass, name, visibleName, health);
     }
 }

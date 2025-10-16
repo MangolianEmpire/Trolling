@@ -133,25 +133,12 @@ public class TheCrazyMobs extends CustomChallenge {
     }
 
     @ChallengeEvent
-    public void onCreeperExplode(EntityExplodeEvent event) {
-        if (!(event.getEntity() instanceof Creeper creeper)) return;
+    public void onCreeperSpawn(CreatureSpawnEvent event) {
+        if (!(event.getEntity() instanceof Creeper)) return;
+        if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM) return;
 
-        Location explosionLoc = creeper.getLocation();
-
-        double radius = 10.0;
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getWorld().equals(explosionLoc.getWorld())
-                    && player.getLocation().distance(explosionLoc) <= radius) {
-
-                Vector direction = player.getLocation().toVector().subtract(explosionLoc.toVector()).normalize();
-
-                double power = 30.0;
-                Vector velocity = direction.multiply(power);
-                velocity.setY(velocity.getY() + 1.0);
-
-                player.setVelocity(velocity);
-            }
-        }
+        event.setCancelled(true);
+        trolling.getCustomMobData().spawn("gravity_creeper", event.getLocation());
     }
 
     @ChallengeEvent
@@ -173,21 +160,13 @@ public class TheCrazyMobs extends CustomChallenge {
     }
 
     @ChallengeEvent
-    public void onZombieDeath(EntityDeathEvent event) {
+    public void onZombieSpawn(CreatureSpawnEvent event) {
         if (!(event.getEntity() instanceof Zombie zombie)) return;
+        if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM) return;
         if (!zombie.isAdult()) return;
 
-        World world = zombie.getWorld();
-        Location location = zombie.getLocation();
-        Random random = new Random();
-        int zombie_amount = random.nextInt(3);
-        zombie_amount = zombie_amount + 2;
-        for (int i = 0; i < zombie_amount; i++) {
-            Zombie baby = (Zombie) world.spawnEntity(location, EntityType.ZOMBIE);
-            baby.setBaby();
-            baby.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 4));
-            baby.setHealth(1);
-        }
+        event.setCancelled(true);
+        trolling.getCustomMobData().spawn("zombie_mother", event.getLocation());
     }
 
     @ChallengeEvent
