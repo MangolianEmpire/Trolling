@@ -8,7 +8,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
-import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -19,10 +18,10 @@ import java.util.List;
 
 public class GravityCreeper extends CustomMob {
 
-    private boolean charging ;
+    private boolean charging;
 
     public GravityCreeper(Trolling trolling) {
-        super(trolling, "gravity_creeper", Creeper.class, "Gravity Creeper", false, 30);
+        super(trolling, "gravity_creeper", Creeper.class, "", false, 30);
         charging = false;
     }
 

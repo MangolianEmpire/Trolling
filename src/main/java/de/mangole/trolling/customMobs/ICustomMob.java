@@ -10,4 +10,6 @@ public interface ICustomMob {
     void spawn(Location location);
     void destroy();
     Mob getMob();
+
+    void setMob(Mob mobEntity);
 }

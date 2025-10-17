@@ -65,6 +65,7 @@ public class Trolling extends JavaPlugin implements Listener {
         this.protocolManager = ProtocolLibrary.getProtocolManager();
         this.reviveBeaconManager = new ReviveBeaconManager(this);
         this.timerManager = new TimerManager(this);
+        customMobData.restoreMobsFromWorlds();
 
         if (gameManager.getGameStatus() == GameStatus.LOST) {
             gameManager.stopGame();
